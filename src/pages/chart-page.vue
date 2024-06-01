@@ -1,0 +1,180 @@
+<template>
+  <div>
+    <el-container>
+      <!--      边栏侧-->
+      <el-aside :width = "asideWidth" style=" min-height: 100vh; background-color: #001529;">
+        <div style="height: 60px; line-height: 60px; display: flex;
+        color: whitesmoke; align-items: center; justify-content: center;">
+          <span style="font-size: 20px; font-weight: bold;">
+            学院数据平台
+          </span>
+
+
+        </div>
+        <el-menu router background-color="#001529" text-color="rgba(255, 255, 255, 0.6)" active-text-color="#ccddcc"
+                 style="border:none;"  :default-active = "$route.path">
+          <el-menu-item index="/menus">
+            <i class="el-icon-s-platform"></i>
+            <span slot="title">工作台</span>
+          </el-menu-item>
+          <el-menu-item index="/data-search">
+            <i class="el-icon-s-data"></i>
+            <span slot="title">数据查询与分析</span>
+          </el-menu-item>
+          <el-menu-item index="/chart-page">
+            <i class="el-icon-data-line"></i>
+            <span slot="title">报表查询</span>
+          </el-menu-item>
+          <el-submenu open index="['/api-use-statistics', '/api-create', '/api-detail']">
+            <template #title>
+              <i class="el-icon-files"></i>
+              <span>API管理</span>
+            </template>
+            <el-menu-item index="/api-use-statistics">API使用情况</el-menu-item>
+            <el-menu-item index ="/api-create">API创建</el-menu-item>
+            <el-menu-item index="/api-detail">API详细信息查询</el-menu-item>
+          </el-submenu>
+          <el-menu-item index="/database/manage">
+            <i class="el-icon-coin"></i>
+            <span slot="title">统一库管理</span>
+          </el-menu-item>
+        </el-menu>
+
+      </el-aside>
+      <el-container>
+        <!--        头部-->
+        <el-header>
+          <el-breadcrumb separator="/">
+            <el-breadcrumb-item>首页</el-breadcrumb-item>
+            <el-breadcrumb-item>报表查询</el-breadcrumb-item>
+          </el-breadcrumb>
+
+          <div style="flex: 1; width: 0;  display: flex; align-items: center; justify-content: flex-end;">
+            <el-dropdown placement="bottom">
+              <div style="display: flex; align-items: center; cursor:default" >
+                <span style="margin-right: 5px;">用户名</span>
+                <i class="el-icon-user-solid"></i>
+              </div>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>个人信息</el-dropdown-item>
+                <el-dropdown-item>修改密码</el-dropdown-item>
+                <el-dropdown-item>退出登录</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+
+          </div>
+        </el-header>
+        <!--        主体-->
+        <el-main>
+          <div style="margin-top: 25px">
+            <el-row style="font-family: 'Arial Black';  font-size: 20px;">
+              报表名：
+              <el-select style="margin-right: 50px" v-model="reportName" multiple placeholder="请选择">
+                <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                </el-option>
+              </el-select>
+              报表格式：
+              <el-select  v-model="reportType" placeholder="请选择">
+                <el-option
+                    v-for="item in reportTypes"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                </el-option>
+              </el-select>
+            </el-row>
+          </div>
+        </el-main>
+
+
+      </el-container>
+
+    </el-container>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "menu-page",
+  data(){
+    return{
+      isCollapse:false,
+      asideWidth: '200px',
+      reportName: '',
+      reportType: '',
+      reportTypes: [
+        {
+          value: 'option1',
+          label: '柱状图'
+        },
+        {
+          value: 'option2',
+          label: '饼状图'
+        },
+        {
+          value: 'option3',
+          label: '折线图'
+        }
+      ],
+      options: [
+        {
+          value: 'option1',
+          label: '报表1'
+        },
+        {
+          value: 'option2',
+          label: '报表2'
+        },
+        {
+          value: 'option3',
+          label: '报表3'
+        },
+        {
+          value: 'option4',
+          label: '报表4'
+        },
+        {
+          value: 'option5',
+          label: '报表5'
+        }
+      ]
+    }
+  },
+  methods:{
+
+  }
+}
+
+</script>
+
+<style>
+.el-menu--inline .el-menu-item {
+  background-color: #000c17  !important;
+}
+.el-menu-item:hover, .el-submenu__title:hover{
+  color: #eeffee !important;
+}
+.el-submenu__title{
+  margin: 4px;
+}
+.el-menu-item.is-active {
+  background-color: #40a9ff !important;
+  border-radius: 7px;
+  margin: 4px;
+}
+.el-menu-item{
+  margin: 4px;
+}
+.el-menu--inline{
+  background-color: #000c17 !important;
+}
+.el-header {
+  box-shadow: 2px 0 6px rgba(0,21,41,.35);
+  display: flex;
+  align-items: center;
+}
+</style>
