@@ -67,15 +67,23 @@
         </el-header>
         <!--        主体-->
         <el-main>
-          <el-form ref="form" :model="apiForm" label-width="370px">
+          <el-form ref="form" :model="apiForm" label-width="30%">
             <el-form-item label="API名称:">
               <el-input style="margin-left: 20px; width: 500px;" v-model="apiForm.name"
-                        placeholder="请输入简洁、清晰的API名称" ></el-input>
+                        placeholder="请输入简洁、清晰的API名称"
+              @blur="checkAPIName"></el-input>
+              <i v-if="APINameExisted && everChecked" class="el-icon-check" style="color: green; font-size: 20px;"></i>
+              <i v-if="!APINameExisted && everChecked" class="el-icon-close" style="color: red; font-size: 20px;"></i>
             </el-form-item>
             <el-form-item label="API描述:">
               <el-input type="textarea" v-model="apiForm.desc"
                         placeholder="请输入API的描述，用于详细说明API的功能、参数、返回结果等信息。这个描述可以帮助其他开发者理解和正确使用API。"
                         style="margin-left: 20px; width: 500px; height: 60px;"></el-input>
+            </el-form-item>
+            <el-form-item label="API描述:">
+              <el-input type="textarea" v-model="apiForm.sql" :rows="6"
+                        placeholder="请输入具体的SQL语言,对数据库的操作包括查看，返回修改数据等"
+                        style="margin-left: 20px; width: 500px; height: 140px;"></el-input>
             </el-form-item>
             <el-form-item label="请求方式:">
               <el-select v-model="apiForm.requestMethod" placeholder="请选择请求方式" style="margin-left: 20px">
@@ -94,19 +102,6 @@
                       :value="item.value">
                   </el-option>
                 </el-select>
-            </el-form-item>
-            <el-form-item label="URL构建:">
-              <el-row>
-                <el-input style="margin-left: 20px; width: 500px;" v-model="apiForm.userid"
-                          placeholder="请输入用户ID" ></el-input>
-                <el-button type="success" round style="margin-left: 15px;">自动生成API</el-button>
-              </el-row>
-              <el-row style="margin-top: 15px;margin-left: 19px;">
-                URL:
-                <el-input style="margin-left: 10px; width: 570px;" v-model="apiForm.url"
-                          placeholder="api.example.com/v1/users/{user_id}/" ><template slot="prepend">Http://</template>
-                </el-input>
-              </el-row>
             </el-form-item>
             <el-form-item label="请求头参数（可选）:">
               <el-input style="margin-left: 20px; width: 500px;" v-model="apiForm.requestHeader"
@@ -131,9 +126,9 @@
               </el-select>
             </el-form-item>
 
-            <el-form-item style="margin-left: 150px ">
+            <el-form-item style="margin-left: 15% ">
               <el-button type="primary" @click="onSubmit">立即创建</el-button>
-              <el-button>取消</el-button>
+              <el-button type="danger" @click="onSubmit">取消</el-button>
             </el-form-item>
           </el-form>
         </el-main>
@@ -150,9 +145,12 @@ export default {
   name: "menu-page",
   data(){
     return{
+      APINameExisted: false,
+      everChecked: false,
       isCollapse:false,
       asideWidth: '200px',
       apiForm: {
+        sql: '',
         name: '',
         requestMethod: '',
         databaseType: '',
@@ -253,6 +251,10 @@ export default {
   methods:{
     onSubmit() {
       console.log('submit!');
+    },
+    checkAPIName(){
+      this.everChecked = true;
+        this.$message.error('进行检测');
     }
   }
 }

@@ -13,11 +13,11 @@
         </div>
         <el-menu router background-color="#001529" text-color="rgba(255, 255, 255, 0.6)" active-text-color="#ccddcc"
                  style="border:none;"  :default-active = "$route.path">
-          <el-menu-item index="/menus">
+          <el-menu-item index="/introduction">
             <i class="el-icon-s-platform"></i>
             <span slot="title">工作台</span>
           </el-menu-item>
-          <el-menu-item index="/data-search">
+          <el-menu-item index="/dataSearch">
             <i class="el-icon-s-data"></i>
             <span slot="title">数据查询与分析</span>
           </el-menu-item>
@@ -46,8 +46,7 @@
         <el-header>
           <el-breadcrumb separator="/">
             <el-breadcrumb-item>首页</el-breadcrumb-item>
-            <el-breadcrumb-item>API管理</el-breadcrumb-item>
-            <el-breadcrumb-item>API详细信息查询</el-breadcrumb-item>
+            <el-breadcrumb-item>基本介绍</el-breadcrumb-item>
           </el-breadcrumb>
 
           <div style="flex: 1; width: 0;  display: flex; align-items: center; justify-content: flex-end;">
@@ -67,48 +66,9 @@
         </el-header>
         <!--        主体-->
         <el-main>
-          <div style="margin-top: 30px;">
-            <el-row style="font-family: 'Arial Black';  font-size: 20px;">
-              搜索内容：
-              <el-input
-                  placeholder="请输入内容"
-                  v-model="searchData"
-                  style="width: 300px;">
-                <i slot="prefix" class="el-input__icon el-icon-search"></i>
-              </el-input>
-
-              <el-select v-model="searchType" style="margin-left: 20px" placeholder="请选择">
-                <el-option
-                    v-for="item in searchTypes"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                </el-option>
-              </el-select>
-              <el-switch
-                  style="margin-left: 20px"
-                  v-model="checkType"
-                  active-text="全字匹配"
-                  inactive-text="非全字匹配">
-              </el-switch>
-              <el-button style="margin-left: 30px" round type="primary" icon="el-icon-search">搜索</el-button>
-            </el-row>
-
-          </div>
-          <div style="margin-top: 20px">
-            <el-table :data="pagedData" @sort-change="handleSortChange" class="centered-table" :fit="true" >
-              <el-table-column
-                  stripe
-                  border
-                  sortable
-                  v-for="(column, index) in dynamicColumns"
-                  :key="index"
-                  :prop="column.attribute"
-                  :label="column.translation"
-                  :width="getColumnWidth(column.attribute)"
-              ></el-table-column>
-            </el-table>
-          </div>
+          <el-main>
+            <router-view @update:user="updateUser" />
+          </el-main>
         </el-main>
 
 
@@ -124,31 +84,13 @@ export default {
   data(){
     return{
       isCollapse:false,
-      asideWidth: '200px',
-      searchData:'',
-      checkType:false,
-      searchTypes:[
-        {
-          value: '1',
-          label: '名称查询'
-        },
-        {
-          value: '2',
-          label: 'URL查询'
-        },
-        {
-          value: '3',
-          label: '业务方查询'
-        },
-        {
-          value: '4',
-          label: '功能查询'
-        }
-      ],
-      searchType:''
+      asideWidth: '200px'
     }
   },
   methods:{
+    updateUser(user) {   // 获取子组件传过来的数据  更新当前页面的数据
+      this.user = JSON.parse(JSON.stringify(user))  // 让父级的对象跟子级的对象毫无关联
+    },
 
   }
 }
@@ -181,5 +123,4 @@ export default {
   display: flex;
   align-items: center;
 }
-
 </style>

@@ -179,7 +179,7 @@
               </el-col>
               <el-col :span="2">
                 <el-input-number  v-model="TableShowNum"
-                                 :min="0"  :max="1000000000000" :step="1" step-strictly></el-input-number>
+                                 :min="0"  :max=tableData.length :step="1" step-strictly></el-input-number>
               </el-col>
 
             </el-row>
@@ -378,10 +378,6 @@
                 </el-select>
               </el-col>
             </el-row>
-            <el-row type="flex" justify="center" align="middle" style="margin-top: 15px">
-              <el-button type="primary" icon="el-icon-search"  @click="RelatedSearch">搜索</el-button>
-              <el-button type="danger" icon="el-icon-delete"  @click="RelatedSearchReset">重置</el-button>
-            </el-row>
             <el-row style="display: flex; margin-top: 15px; align-items: center;">
               <el-col :span="1.5" style="margin-left: 20%; font-size: 15px; font-weight: bold; font-family: '微软雅黑', cursive;">
                 展示属性：
@@ -405,7 +401,11 @@
                 <el-input-number  v-model="TableShowNum"
                                   :min="0"  :max="1000000000000" :step="1" step-strictly></el-input-number>
               </el-col>
+            </el-row>
 
+            <el-row type="flex" justify="center" align="middle" style="margin-top: 15px">
+              <el-button type="primary" icon="el-icon-search"  @click="RelatedSearch">搜索</el-button>
+              <el-button type="danger" icon="el-icon-delete"  @click="RelatedSearchReset">重置</el-button>
             </el-row>
 
           </div>
@@ -464,13 +464,14 @@
               </el-col>
               <el-col :span="2.5">
                 <el-select v-model="GroupSearchType"
+                           multiple
                            @change=""
                            placeholder="请选择">
                   <el-option
                       v-for="item in GroupSearchAggregationTypeList"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
+                      :key="item.attribute"
+                      :label="item.translation"
+                      :value="item.attribute">
                   </el-option>
                 </el-select>
               </el-col>
@@ -493,29 +494,7 @@
             </el-row>
 
             <el-row style="display: flex; margin-top: 15px; align-items: center;">
-              <el-col :span="10" style="margin-left: 25%; text-align: center;">
-                <el-button type="primary" icon="el-icon-search" @click="GroupSearch">搜索</el-button>
-                <el-button type="danger" icon="el-icon-delete" @click="GroupSearchReset">重置</el-button>
-              </el-col>
-            </el-row>
-
-            <el-row style="display: flex; margin-top: 15px; align-items: center;">
-              <el-col :span="1.5" style="margin-left: 20%; font-size: 15px; font-weight: bold; font-family: '微软雅黑', cursive;">
-                展示属性：
-              </el-col>
-              <el-col :span="5">
-                <el-select
-                    v-model="GroupShowIndexNameList"
-                    multiple placeholder="请选择">
-                  <el-option
-                      v-for="item in GroupSearchIndexShowNameList"
-                      :key="item.attribute"
-                      :label="item.translation"
-                      :value="item.attribute">
-                  </el-option>
-                </el-select>
-              </el-col>
-              <el-col :span="3" style="margin-left: 6%; font-size: 15px; font-weight: bold; font-family: '微软雅黑', cursive;">
+              <el-col :span="3" style="margin-left: 35%; font-size: 15px; font-weight: bold; font-family: '微软雅黑', cursive;">
                 展示个数(0为全选)：
               </el-col>
               <el-col :span="2">
@@ -524,12 +503,19 @@
               </el-col>
 
             </el-row>
+            <el-row style="display: flex; margin-top: 15px; align-items: center;">
+              <el-col :span="10" style="margin-left: 25%; text-align: center;">
+                <el-button type="primary" icon="el-icon-search" @click="GroupSearch">搜索</el-button>
+                <el-button type="danger" icon="el-icon-delete" @click="GroupSearchReset">重置</el-button>
+              </el-col>
+            </el-row>
           </div>
           <div style="margin-top: 20px;">
-            <el-table :data="tableData" class="centered-table" >
+            <el-table :data="pagedData" @sort-change="handleSortChange" class="centered-table" :fit="true" >
               <el-table-column
                   stripe
                   border
+                  sortable
                   v-for="(column, index) in dynamicColumns"
                   :key="index"
                   :prop="column.attribute"
@@ -537,6 +523,15 @@
                   :width="getColumnWidth(column.attribute)"
               ></el-table-column>
             </el-table>
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page.sync="currentPage"
+                :page-sizes="[10, 20, 30, 40]"
+                :page-size="pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="tableData.length"
+            ></el-pagination>
           </div>
           <div style="margin-top: 15px; display: flex; align-items: center; justify-content: flex-end;">
             <el-row>
@@ -555,35 +550,33 @@
           </div>
           <div>
             <el-row style="margin-top: 15px; display: flex; align-items: center;">
-              <el-col :span="3" style="font-size: 20px; font-weight: bold; font-family: '微软雅黑', cursive;">
+              <el-col :span="2.5" style="font-size: 20px; font-weight: bold; font-family: '微软雅黑', cursive;">
                 聚合值选择:
               </el-col>
               <el-col :span="0">
 
               </el-col>
-              <el-col :span="4">
-                <el-select v-model="aggregateValue" multiple placeholder="请选择">
+              <el-col :span="4" style="">
+                <el-select v-model="AnalysisAggregateValue"  placeholder="请选择">
                   <el-option
-                      v-for="item in aggregateValueList"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
+                      v-for="item in AnalysisAggregateValueList"
+                      :key="item.attribute"
+                      :label="item.translation"
+                      :value="item.attribute">
                   </el-option>
                 </el-select>
               </el-col>
-              <el-col :span="1">
 
-              </el-col>
-              <el-col :span="2" style="font-size: 20px; font-weight: bold; font-family: '微软雅黑', cursive;">
+              <el-col :span="2.5" style="margin-left: 5%; font-size: 20px; font-weight: bold; font-family: '微软雅黑', cursive;">
                 分组设置:
               </el-col>
               <el-col :span="2.5">
-                <el-select v-model="tableName" placeholder="请选择">
+                <el-select v-model="AnalysisGroupValue" placeholder="请选择">
                   <el-option
-                      v-for="item in tableList"
-                      :key="item.table_name"
+                      v-for="item in AnalysisGroupValueList"
+                      :key="item.attribute"
                       :label="item.translation"
-                      :value="item.table_name">
+                      :value="item.attribute">
                   </el-option>
                 </el-select>
               </el-col>
@@ -591,22 +584,61 @@
 
               </el-col>
               <el-col :span="3">
-                  <el-button type="primary" icon="el-icon-search">分析</el-button>
+                  <el-button type="primary" icon="el-icon-search" @click="Analyze">分析</el-button>
               </el-col>
+            </el-row>
+            <el-row style="margin-top: 20px">
+              柱状图
+              <el-switch
+                  v-model="bar_display"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+              style="margin-right: 2%">
+              </el-switch>
+              折线图
+              <el-switch
+                  v-model="line_display"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                  style="margin-right: 2%">
+              </el-switch>
+              饼状图
+              <el-switch
+                  v-model="pie_display"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                  style="margin-right: 2%">
+              </el-switch>
             </el-row>
 
           </div>
 
-          <div style="margin-top: 20px;">
-            <el-table :data="tableData" class="custom-table" >
-              <el-table-column
-                  v-for="(column, index) in dynamicColumns"
-                  :key="index"
-                  :prop="column.prop"
-                  :label="column.label"
-              ></el-table-column>
-            </el-table>
+          <div style="margin-top: 20px; display: flex; justify-content: center;">
+            <div v-if="bar_display" id="bar-chart" style="width: 1080px;height:400px;"></div>
           </div>
+          <div style="margin-top: 20px; display: flex; justify-content: center;">
+            <div v-if="line_display" id="line-chart" style="width: 1080px; height: 400px;"></div>
+          </div>
+          <div style="margin-top: 20px; display: flex; justify-content: center;">
+            <div v-if="pie_display" id="pie-chart" style="width: 800px; height: 600px;"></div>
+          </div>
+
+          <div
+              v-if="(bar_display || pie_display || line_display) || everAnalyzed"
+              style="display: flex; justify-content: center; align-items: center; margin-top: 10px; height: 100px;">
+            <div style="display: flex; align-items: center;">
+              <span style="margin-right: 10px;">自定义报表名：</span>
+              <el-input
+                  placeholder="请输入报表名称"
+                  v-model="charts_name"
+                  clearable
+                  style="margin-right: 20px; width: 200px;"> <!-- 可以根据需要调整宽度 -->
+              </el-input>
+              <el-button @click = "subscribe" type="success" icon="el-icon-collection" round>订阅</el-button>
+            </div>
+          </div>
+
+
 
 
         </el-main>
@@ -620,11 +652,15 @@
 
 <script>
 import axios from "axios";
+import * as echarts from 'echarts';
 
 export default {
   name: "menu-page",
   data(){
     return{
+      CurrentTableSearchType:'',
+      begin:'',
+      end:'',
       isCollapse:false,
       asideWidth: '200px',
       searchContent: '',
@@ -660,12 +696,19 @@ export default {
       GroupSearchTableName: '',
       GroupSearchGroupIndexName: '',
       GroupSearchAggregationIndex: '',
-      GroupSearchType: '',
+      GroupSearchType: [],
+      currentPage: 1,
+      pageSize:10,
       BasicShowIndexNameList: [],
       GroupShowIndexNameList: [],
       RelatedShowIndexNameList: [],
       RangeShowIndexNameList: [],
       TableShowNum: 0,
+      pagedData:[],
+      AnalysisAggregateValue:'',
+      AnalysisAggregateValueList:[],
+      AnalysisGroupValue:'',
+      AnalysisGroupValueList:[],
       RelatedSearchIndexShowNameList: [{
         value: '选项1',
         label: '展示属性1'
@@ -695,36 +738,38 @@ export default {
         label: '聚合属性3'
       }],
       GroupSearchAggregationTypeList: [{
-        value: '平均值',
-        label: '平均值'
+        attribute: 'AVG',
+        translation: '平均值'
       },
-          {
-        value: '最小值',
-        label: '最小值'
+      {attribute: 'MIN',
+        translation: '最小值'
       },
-      {
-        value: '最大值',
-        label: '最大值'
+      {attribute: 'COUNT',
+        translation: '计数'
       },
       {
-        value: '中位数',
-        label: '中位数'
+        attribute: 'MAX',
+        translation: '最大值'
       },
       {
-        value: '求和',
-        label: '求和'
+        attribute: 'MEDIAN',
+        translation: '中位数'
       },
       {
-        value: '众数',
-        label: '众数'
+        attribute: 'SUM',
+        translation: '求和'
       },
       {
-        value: '标准差',
-        label: '标准差'
+        attribute: 'MODE',
+        translation: '众数'
       },
       {
-        value: '方差',
-        label: '方差'
+        attribute: 'STD',
+        translation: '标准差'
+      },
+      {
+        attribute: 'VAR',
+        translation: '方差'
       }],
       GroupSearchGroupIndexNameList: [{
         value: '选项1',
@@ -739,22 +784,22 @@ export default {
         label: '分组属性3'
       }],
       RelatedSearchMethodList: [{
-        value: '等于',
+        value: '=',
         label: '＝'
       }, {
-        value: '不等于',
+        value: '!=',
         label: '≠'
       }, {
-        value: '大于',
+        value: '>',
         label: '＞'
       }, {
-        value: '小于',
+        value: '<',
         label: '＜'
       }, {
-        value: '大于等于',
+        value: '>=',
         label: '≥'
       }, {
-        value: '小于等于',
+        value: '<=',
         label: '≤'
       }],
       pickerOptions: {
@@ -829,16 +874,6 @@ export default {
         value: '选项5',
         label: '属性5'
       }],
-      aggregateValueList: [{
-        value: '选项1',
-        label: '聚合值1'
-      }, {
-        value: '选项2',
-        label: '聚合值2'
-      }, {
-        value: '选项3',
-        label: '聚合值3'
-      }],
       databaseList: [{
         value: '选项1',
         label: '黄金糕'
@@ -911,32 +946,121 @@ export default {
           name: '王小虎',
           address: '上海市普陀区金沙江路 1516 弄'
         }
-      ]
+      ],
+
+      // 数据分析图表
+      bar_display:false,
+      line_display:false,
+      pie_display:false,
+      charts_name:'',
+      everAnalyzed:false,
+      chart_tableName:'',
+
+      bar_option : {//柱状图
+        tooltip: {
+          trigger: 'axis'
+        },
+        legend: {
+          left: 'left'
+        },
+        xAxis: {
+          type: 'category',
+          data: []
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+
+        ]
+      },
+      line_option : { //折线图
+        title: {
+          text: '订单销售的趋势图',
+          left: 'center'
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        legend: {
+          left: 'left'
+        },
+        xAxis: {
+          type: 'category',
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          name: '日期'
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            name: '金额',
+            data: [820, 932, 901, 934, 1290, 1330, 1320],
+            type: 'line',
+            smooth: true
+          },
+          {
+            name: '库存',
+            data: [356, 987, 457, 768, 390, 680, 1920],
+            type: 'line',
+            smooth: true
+          }
+        ]
+      },
+      pie_option: {//饼状图
+        title: {
+          text: '订单销售统计',
+          subtext: '比例图',
+          left: 'center'
+        },
+        tooltip: {
+          trigger: 'item'
+        },
+        legend: {
+          orient: 'vertical',
+          left: 'left'
+        },
+        series: [
+          {
+            name: 'Access From',
+            type: 'pie',
+            center: ['50%', '60%'],
+            radius: '50%',
+            data: [
+              { value: 1048, name: 'Search Engine' },
+              { value: 735, name: 'Direct' },
+              { value: 580, name: 'Email' },
+              { value: 484, name: 'Union Ads' },
+              { value: 300, name: 'Video Ads' }
+            ],
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+              }
+            }
+          }
+        ]
+      }
     }
   },
   methods:{
     getColumnWidth(prop) {
-      // 获取每列内容中最长的字符串长度
-      const maxLength = this.tableData.reduce((max, item) => {
-        const value = String(item[prop] || ''); // 将属性值转换为字符串
+      const maxLength = this.getMaxColumnLength(prop);
+      const titleWidth = prop.length * 15; // Assuming each character width is 15px
+      const dynamicWidth = Math.max(maxLength * 15, titleWidth);
+      return `${Math.min(Math.max(dynamicWidth, 80), 200)}px`; // Ensure the width is between 80px and 200px
+    },
+    getMaxColumnLength(prop) {
+      return this.tableData.reduce((max, item) => {
+        const value = String(item[prop] || ''); // Convert property value to string
         return Math.max(max, value.length);
       }, 0);
-
-      const maxTitleLength = prop.length; // 获取列标题的长度
-
-      // 根据最大长度来动态设置列宽
-      const maxWidth = 200; // 设置一个最大宽度，避免列宽过大
-      const minWidth = 80; // 设置一个最小宽度，确保列宽不会太小
-      const titleWidth = maxTitleLength * 15; // 假设每个字符宽度为 15px
-
-      // 根据最长的字符串长度和标题长度动态计算列宽
-      let width = Math.max(maxLength * 15, titleWidth); // 取内容长度和标题长度中较大的一个作为列宽
-      width = Math.min(width, maxWidth); // 确保列宽不会超过最大宽度
-      width = Math.max(width, minWidth); // 确保列宽不会小于最小宽度
-
-      return width + 'px';
     },
     BasicSearchReset(){
+      this.BasicShowIndexNameList = []
       this.BasicSearchContent = ''
       this.BasicSearchDatabaseName = ''
       this.BasicSearchTableName = ''
@@ -952,9 +1076,9 @@ export default {
           table: this.BasicSearchTableName
         }
       }).then(response => {
-        console.log(response.data)
         this.BasicSearchIndexNameList = response.data
         this.BasicSearchIndexShowNameList = response.data
+
       }).catch(error => {
         console.log(error);
       })
@@ -973,20 +1097,25 @@ export default {
         this.$message.error('请选择属性')
         return;
       }
-      console.log(this.dynamicColumns)
+
+      this.CurrentTableSearchType = '基础搜索'
+
       axios({
         method: 'post',
-        url: 'http://localhost:10010/search/normal/mapping',
+        url: 'http://localhost:10010/search/mapping',
         data: {
           table: this.BasicSearchTableName,
           attributes: this.BasicShowIndexNameList,
         }
       }).then(response => {
-        console.log(response.data)
         this.dynamicColumns = response.data
+        this.AnalysisGroupValueList = response.data
+        this.AnalysisAggregateValueList = response.data
       }).catch(error => {
         console.log(error);
       })
+
+
       axios({
         method: 'post',
         url: 'http://localhost:10010/search/normal',
@@ -1002,14 +1131,161 @@ export default {
           start: 0
         }
       }).then(response => {
-        console.log(response.data)
         this.tableData = response.data
+        this.handleCurrentChange(1); // 切换每页条数时回到第一页
       }).catch(error => {
         console.log(error);
       })
-      console.log(this.BasicSearchContent)
+
+      this.chart_tableName = this.BasicSearchTableName
     },
+
+
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.handleCurrentChange(1); // 切换每页条数时回到第一页
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      const startIndex = (val - 1) * this.pageSize;
+      const endIndex = startIndex + this.pageSize;
+      this.pagedData = this.tableData.slice(startIndex, endIndex);
+    },
+    // 排序
+    handleSortChange({ column, prop, order}) {
+      if (this.CurrentTableSearchType === '基础搜索') {
+        axios({
+          method: 'post',
+          url: 'http://localhost:10010/search/normal',
+          data: {
+            value: this.BasicSearchContent,
+            databaseName: this.BasicSearchDatabaseName,
+            table: this.BasicSearchTableName,
+            attribute: this.BasicSearchIndexName,
+            type: this.BasicSearchCheckType,
+            attributes: this.BasicShowIndexNameList,
+            order: prop,
+            count: this.TableShowNum,
+            start: 0,
+            desc:order
+          }
+        }).then(response => {
+          this.tableData = response.data
+          this.handleCurrentChange(1); // 切换每页条数时回到第一页
+        }).catch(error => {
+          console.log(error);
+        })
+      }
+
+      if (this.CurrentTableSearchType === '关联搜索') {
+        axios({
+          method: 'post',
+          url: 'http://localhost:10010/search/connect',
+          data: {
+            databaseName: this.RelatedSearchDatabaseName,
+            table1: this.RelatedSearchTableName1,
+            table2: this.RelatedSearchTableName2,
+            attribute1: this.RelatedSearchIndexName1,
+            attribute2: this.RelatedSearchIndexName2,
+            compareType: this.RelatedSearchMethod,
+            attributes: this.RelatedShowIndexNameList,
+            count: this.TableShowNum,
+            desc:order,
+            order: prop,
+          }
+        }).then(response => {
+          console.log(response.data)
+          this.tableData = response.data
+          this.handleCurrentChange(1); // 切换每页条数时回到第一页
+        }).catch(error => {
+          console.log(error);
+        })
+      }
+
+
+      if (this.CurrentTableSearchType === '分组搜索') {
+        axios({
+          method: 'post',
+          url: 'http://localhost:10010/search/group',
+          data: {
+            databaseName: this.GroupSearchDatabaseName,
+            table: this.GroupSearchTableName,
+            group: this.GroupSearchGroupIndexName,
+            aggregateTypes: this.GroupSearchType,
+            aggregate: this.GroupSearchAggregationIndex,
+            count: this.TableShowNum,
+            order: prop,
+            value: '',
+            type:'',
+            attribute:'',
+            desc:order,
+          }
+        }).then(response => {
+          this.tableData = response.data
+          this.handleCurrentChange(1); // 切换每页条数时回到第一页
+        }).catch(error => {
+          console.log(error);
+        })
+      }
+
+
+      if (this.CurrentTableSearchType === '范围搜索') {
+        if(this.rangeType === '1'){
+          axios({
+            method: 'post',
+            url: 'http://localhost:10010/search/range',
+            data: {
+              databaseName: this.RangeSearchDatabaseName,
+              table: this.RangeSearchTableName,
+              attribute: this.RangeSearchIndexName,
+              attributes : this.RangeShowIndexNameList,
+              dateRange: this.DateRange,
+              begin: this.begin,
+              end: this.end,
+              order: prop,
+              count: this.TableShowNum,
+              start: 0,
+              desc:order
+            }
+          }).then(response => {
+            this.tableData = response.data
+            this.handleCurrentChange(1); // 切换每页条数时回到第一页
+          }).catch(error => {
+            console.log(error);
+          })
+        }
+
+
+        if (this.rangeType === '2'){
+          axios({
+            method: 'post',
+            url: 'http://localhost:10010/search/range',
+            data: {
+              databaseName: this.RangeSearchDatabaseName,
+              table: this.RangeSearchTableName,
+              attribute: this.RangeSearchIndexName,
+              attributes : this.RangeShowIndexNameList,
+              dateRange: this.DateRange,
+              begin: this.rangeMinValue,
+              end: this.rangeMaxValue,
+              order: prop,
+              count: this.TableShowNum,
+              start: 0,
+              desc:order
+            }
+          }).then(response => {
+            this.tableData = response.data
+            this.handleCurrentChange(1); // 切换每页条数时回到第一页
+          }).catch(error => {
+            console.log(error);
+          })
+        }
+      }
+
+    },
+
     RangeSearchReset(){
+      this.RangeSearchIndexShowNameList = ''
       this.RangeSearchDatabaseName = ''
       this.RangeSearchTableName = ''
       this.RangeSearchIndexName = ''
@@ -1035,7 +1311,6 @@ export default {
     RangeSearchIndexChange(){
       // 获取所选属性的对象
       const selectedItem = this.RangeSearchIndexNameList.find(item => item.attribute === this.RangeSearchIndexName);
-      console.log(selectedItem)
       // 根据所选属性名称动态设置对应的Rangetype
       if (selectedItem) {
         if (selectedItem.class_name === "String") {
@@ -1059,30 +1334,88 @@ export default {
         return;
       }
       if(this.rangeType === '1'){
-        if(this.DateRange === ''){
+        if(this.DateRange === ''|| this.DateRange === null){
           this.$message.error('请选择日期范围')
           return;
         }
       }
+      if(this.rangeType === '1'){
+        this.begin = this.DateRange[0]
+            this.end = this.DateRange[1]
+      }
+
+      this.CurrentTableSearchType = '范围搜索'
       axios({
         method: 'post',
-        url: '/range-search',
+        url: 'http://localhost:10010/search/mapping',
         data: {
-          databaseName: this.RangeSearchDatabaseName,
-          tableName: this.RangeSearchTableName,
-          indexName: this.RangeSearchIndexName,
-          rangeType: this.rangeType,
-          dateRange: this.DateRange,
-          rangeMinValue: this.rangeMinValue,
-          rangeMaxValue: this.rangeMaxValue
+          table: this.RangeSearchTableName,
+          attributes: this.RangeShowIndexNameList,
+
         }
       }).then(response => {
-        this.tableData = response.data.tableData
-        this.dynamicColumns = response.data.dynamicColumns
+        this.dynamicColumns = response.data
+        this.AnalysisGroupValueList = response.data
+        this.AnalysisAggregateValueList = response.data
       }).catch(error => {
         console.log(error);
       })
+
+
+      if(this.rangeType === '2'){
+        axios({
+          method: 'post',
+          url: 'http://localhost:10010/search/range',
+          data: {
+            databaseName: this.RangeSearchDatabaseName,
+            table: this.RangeSearchTableName,
+            attribute: this.RangeSearchIndexName,
+            attributes : this.RangeShowIndexNameList,
+            dateRange: this.DateRange,
+            begin: this.rangeMinValue,
+            end: this.rangeMaxValue,
+            order: '',
+            count: this.TableShowNum,
+            start: 0,
+            desc:''
+          }
+        }).then(response => {
+          this.tableData = response.data
+          this.handleCurrentChange(1); // 切换每页条数时回到第一页
+        }).catch(error => {
+          console.log(error);
+        })
+      }
+
+
+      if(this.rangeType === '1'){
+        axios({
+          method: 'post',
+          url: 'http://localhost:10010/search/range',
+          data: {
+            databaseName: this.RangeSearchDatabaseName,
+            table: this.RangeSearchTableName,
+            attribute: this.RangeSearchIndexName,
+            attributes : this.RangeShowIndexNameList,
+            dateRange: this.DateRange,
+            begin: this.DateRange[0],
+            end: this.DateRange[1],
+            order: '',
+            count: this.TableShowNum,
+            start: 0,
+            desc:''
+          }
+        }).then(response => {
+          this.tableData = response.data
+          this.handleCurrentChange(1); // 切换每页条数时回到第一页
+        }).catch(error => {
+          console.log(error);
+        })
+      }
+      this.chart_tableName = this.RangeSearchTableName
     },
+
+
     RelatedSearchTableChange1(){
       axios({
         method: 'post',
@@ -1096,7 +1429,16 @@ export default {
         console.log(error);
       })
     },
+
+
     RelatedSearchTableChange2(){
+
+      if(this.RelatedSearchTableName1 === this.RelatedSearchTableName2){
+        this.$message.error('请选择不同的表')
+        this.RelatedSearchTableName2 = '' // 重置表2的值为空
+        return;
+      }
+
       axios({
         method: 'post',
         url: 'http://localhost:10010/search/table/attribute',
@@ -1108,19 +1450,26 @@ export default {
       }).catch(error => {
         console.log(error);
       })
-    },
-    RelatedSearchIndexChange1(){
+
       axios({
         method: 'post',
-        url: '/index-name',
+        url: 'http://localhost:10010/search/connect/mapping',
         data: {
-          IndexName: this.RelatedSearchIndexName1
+          table1: this.RelatedSearchTableName1,
+          table2: this.RelatedSearchTableName2
         }
       }).then(response => {
-        this.indexNameList2 = response.data.indexNameList
+        this.RelatedSearchIndexShowNameList = response.data
       }).catch(error => {
         console.log(error);
       })
+    },
+    RelatedSearchIndexChange1(){
+      if(this.RelatedSearchIndexName1 === this.RelatedSearchIndexName2){
+        this.$message.error('请选择不同的属性')
+        this.RelatedSearchIndexName1 = '' // 重置属性2的值为空
+        return
+      }
     },
     RelatedSearchIndexChange2(){
       if(this.RelatedSearchIndexName1 === ''){
@@ -1136,6 +1485,8 @@ export default {
       this.RelatedSearchIndexName2 = ''
       this.RelatedSearchMethod = ''
     },
+
+
     RelatedSearch(){
       if(this.RelatedSearchDatabaseName === ''){
         this.$message.error('请选择库名')
@@ -1161,24 +1512,49 @@ export default {
         this.$message.error('请选择关联方式')
         return;
       }
+      this.CurrentTableSearchType = '关联搜索'
+
+
       axios({
         method: 'post',
-        url: '/related-search',
+        url: 'http://localhost:10010/search/connect/attribute/mapping',
         data: {
-          databaseName: this.RelatedSearchDatabaseName,
-          tableName1: this.RelatedSearchTableName1,
-          tableName2: this.RelatedSearchTableName2,
-          indexName1: this.RelatedSearchIndexName1,
-          indexName2: this.RelatedSearchIndexName2,
-          method: this.RelatedSearchMethod
+          table1: this.RelatedSearchTableName1,
+          table2: this.RelatedSearchTableName2,
+          attributes: this.RelatedShowIndexNameList,
         }
       }).then(response => {
-        this.tableData = response.data.tableData
-        this.dynamicColumns = response.data.dynamicColumns
+        this.dynamicColumns = response.data
+        this.AnalysisGroupValueList = response.data
+        this.AnalysisAggregateValueList = response.data
       }).catch(error => {
         console.log(error);
       })
+
+      axios({
+        method: 'post',
+        url: 'http://localhost:10010/search/connect',
+        data: {
+          databaseName: this.RelatedSearchDatabaseName,
+          table1: this.RelatedSearchTableName1,
+          table2: this.RelatedSearchTableName2,
+          attribute1: this.RelatedSearchIndexName1,
+          attribute2: this.RelatedSearchIndexName2,
+          compareType: this.RelatedSearchMethod,
+          attributes: this.RelatedShowIndexNameList,
+          count: this.TableShowNum,
+          order: '',
+        }
+      }).then(response => {
+        this.tableData = response.data
+        this.handleCurrentChange(1); // 切换每页条数时回到第一页
+      }).catch(error => {
+        console.log(error);
+      })
+
     },
+
+
      GroupSearchTableChange(){
       axios({
         method: 'post',
@@ -1201,6 +1577,8 @@ export default {
       this.GroupSearchAggregationIndex = ''
       this.GroupSearchType = ''
     },
+
+
     GroupSearch(){
       if(this.GroupSearchDatabaseName === ''){
         this.$message.error('请选择库名')
@@ -1222,25 +1600,132 @@ export default {
         this.$message.error('请选择聚合属性')
         return;
       }
+      this.CurrentTableSearchType = '分组搜索'
       axios({
         method: 'post',
-        url: '/group-search',
+        url: 'http://localhost:10010/search/group/mapping',
         data: {
           databaseName: this.GroupSearchDatabaseName,
-          tableName: this.GroupSearchTableName,
-          groupIndexName: this.GroupSearchGroupIndexName,
-          aggregationType: this.GroupSearchType,
-          aggregationIndex: this.GroupSearchAggregationIndex
+          table: this.GroupSearchTableName,
+          group: this.GroupSearchGroupIndexName,
+          aggregateTypes: this.GroupSearchType,
+          aggregate: this.GroupSearchAggregationIndex
         }
       }).then(response => {
-        this.tableData = response.data.tableData
-        this.dynamicColumns = response.data.dynamicColumns
+        this.dynamicColumns = response.data
+        this.AnalysisGroupValueList = response.data
+        this.AnalysisAggregateValueList = response.data
+      }).catch(error => {
+        console.log(error);
+      })
+
+      axios({
+        method: 'post',
+        url: 'http://localhost:10010/search/group',
+        data: {
+          databaseName: this.GroupSearchDatabaseName,
+          table: this.GroupSearchTableName,
+          group: this.GroupSearchGroupIndexName,
+          aggregateTypes: this.GroupSearchType,
+          aggregate: this.GroupSearchAggregationIndex,
+          count: this.TableShowNum,
+          order: '',
+          value: '',
+          type:'',
+          attribute:'',
+          desc:'',
+        }
+      }).then(response => {
+        this.tableData = response.data
+        this.handleCurrentChange(1); // 切换每页条数时回到第一页
+      }).catch(error => {
+        console.log(error);
+      })
+      this.chart_tableName = this.GroupSearchTableName
+    },
+
+    Analyze(){
+      if(this.AnalysisGroupValue === ''){
+        this.$message.error('请选择分组属性')
+        return;
+      }
+      if(this.AnalysisAggregateValue === ''){
+        this.$message.error('请选择聚合属性')
+        return;
+      }
+      if(this.AnalysisGroupValue === this.AnalysisAggregateValue){
+        this.$message.error('请选择不同的属性')
+        return;
+      }
+
+      this.everAnalyzed = true
+
+      axios({
+        method: 'post',
+        url: 'http://localhost:10010/search/analysis/bar',
+        data: {
+          group:this.AnalysisGroupValue,
+          aggregate:this.AnalysisAggregateValue,
+          data:this.tableData
+        }
+      }).then(response => {
+        console.log(response.data)
+        this.bar_option.series = response.data.series
+        this.bar_option.xAxis.data = response.data.xValues
+
+        // 柱状图
+        let barDom = document.getElementById('bar-chart');
+        let barChart = echarts.init(barDom);
+        barChart.setOption(this.bar_option)
+
       }).catch(error => {
         console.log(error);
       })
     },
 
+    //图表
+    initializeLineChart() {
+      this.$nextTick(() => {
+        let linetDom = document.getElementById('line-chart');
+        if (linetDom) {
+          let lineChart = echarts.init(linetDom);
+          lineChart.setOption(this.line_option);
+        }
+      });
+    },
+    initializePieChart() {
+      this.$nextTick(() => {
+        let pieDom = document.getElementById('pie-chart');
+        if (pieDom) {
+          let pieChart = echarts.init(pieDom);
+          pieChart.setOption(this.pie_option);
+        }
+      });
+    },
+    subscribe(){
+      if(this.charts_name === ''){
+        this.$message.error('请输入报表名称')
+        return;
+      }
+      if(!this.everAnalyzed){
+        this.$message.error('请先对表进行分析')
+        return;
+      }
 
+    }
+
+  },
+  watch: {
+    line_display(newVal) {
+      if (newVal) {
+        this.initializeLineChart();
+      }
+    },
+    pie_display(newVal) {
+      if (newVal) {
+        this.initializePieChart();
+      }
+    },
   },
   mounted() {
     axios.get('http://localhost:10010/search/table')
@@ -1250,6 +1735,7 @@ export default {
     .catch(error => {
       console.log(error)
     })
+    this.pagedData =  this.tableData.slice(0, this.pageSize);
   }
 }
 
