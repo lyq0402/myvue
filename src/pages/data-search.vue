@@ -1122,6 +1122,8 @@ export default {
       })
 
       this.chart_tableName = this.BasicSearchTableName
+      this.AnalysisAggregateValue = ''
+      this.AnalysisGroupValue = ''
     },
 
 
@@ -1397,6 +1399,8 @@ export default {
         })
       }
       this.chart_tableName = this.RangeSearchTableName
+      this.AnalysisAggregateValue = ''
+      this.AnalysisGroupValue = ''
     },
 
 
@@ -1509,8 +1513,6 @@ export default {
         }
       }).then(response => {
         this.dynamicColumns = response.data
-        this.AnalysisGroupValueList = response.data
-        this.AnalysisAggregateValueList = response.data
       }).catch(error => {
         console.log(error);
       })
@@ -1535,6 +1537,13 @@ export default {
       }).catch(error => {
         console.log(error);
       })
+
+      this.AnalysisGroupValueList = this.RelatedSearchIndexShowNameList
+      this.AnalysisAggregateValueList = this.RelatedSearchIndexShowNameList
+
+      this.chart_tableName = this.RelatedSearchTableName1
+      this.AnalysisAggregateValue = ''
+      this.AnalysisGroupValue = ''
 
     },
 
@@ -1626,6 +1635,8 @@ export default {
         console.log(error);
       })
       this.chart_tableName = this.GroupSearchTableName
+      this.AnalysisAggregateValue = ''
+      this.AnalysisGroupValue = ''
     },
 
     Analyze(){
@@ -1684,7 +1695,6 @@ export default {
           table:this.chart_tableName
         }
       }).then(response => {
-        console.log(response.data)
         response.data.series.forEach(seriesItem => {
           if (seriesItem.label && typeof seriesItem.label.formatter === 'string') {
             seriesItem.label.formatter = new Function('return ' + seriesItem.label.formatter)();
@@ -1698,6 +1708,8 @@ export default {
       }).catch(error => {
         console.log(error);
       })
+      console.log(this.AnalysisGroupValue)
+      console.log(this.AnalysisAggregateValue)
     },
 
     //图表
