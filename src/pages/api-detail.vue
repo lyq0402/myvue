@@ -96,11 +96,10 @@
 
           </div>
           <div style="margin-top: 20px">
-            <el-table :data="pagedData" @sort-change="handleSortChange" class="centered-table" :fit="true" >
+            <el-table :data="tableData"  class="centered-table" :fit="true" >
               <el-table-column
                   stripe
                   border
-                  sortable
                   v-for="(column, index) in dynamicColumns"
                   :key="index"
                   :prop="column.attribute"
@@ -127,6 +126,7 @@ export default {
       asideWidth: '200px',
       searchData:'',
       checkType:false,
+      searchType:'',
       searchTypes:[
         {
           value: '1',
@@ -145,11 +145,58 @@ export default {
           label: '功能查询'
         }
       ],
-      searchType:''
+      dynamicColumns: [
+        {
+          attribute: 'apiName',
+          translation: 'api名称'
+        },
+        {
+          attribute: 'apiIntroduction',
+          translation: 'api描述'
+        },
+        {
+          attribute: 'Request_method',
+          translation: '请求方式'
+        },
+        {
+          attribute: 'database_type',
+          translation: '数据库类型'
+        },
+        {
+          attribute: 'request_header',
+          translation: '请求头参数'
+        },
+        {
+          attribute: 'Identity_information',
+          translation: '身份验证信息'
+        },
+        {
+          attribute: 'outTime',
+          translation: '超时终止'
+        },
+        {
+          attribute: 'customers',
+          translation: '业务用户'
+        }
+      ],
+      tableData: [
+
+      ]
     }
   },
   methods:{
-
+    getColumnWidth(prop) {
+      const maxLength = this.getMaxColumnLength(prop);
+      const titleWidth = prop.length * 15; // Assuming each character width is 15px
+      const dynamicWidth = Math.max(maxLength * 15, titleWidth);
+      return `${Math.min(Math.max(dynamicWidth, 80), 200)}px`; // Ensure the width is between 80px and 200px
+    },
+    getMaxColumnLength(prop) {
+      return this.tableData.reduce((max, item) => {
+        const value = String(item[prop] || ''); // Convert property value to string
+        return Math.max(max, value.length);
+      }, 0);
+    },
   }
 }
 

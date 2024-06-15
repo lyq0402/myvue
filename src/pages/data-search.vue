@@ -752,24 +752,12 @@ export default {
         translation: '最大值'
       },
       {
-        attribute: 'MEDIAN',
-        translation: '中位数'
-      },
-      {
         attribute: 'SUM',
         translation: '求和'
       },
       {
-        attribute: 'MODE',
-        translation: '众数'
-      },
-      {
         attribute: 'STD',
         translation: '标准差'
-      },
-      {
-        attribute: 'VAR',
-        translation: '方差'
       }],
       GroupSearchGroupIndexNameList: [{
         value: '选项1',
@@ -975,10 +963,6 @@ export default {
         ]
       },
       line_option : { //折线图
-        title: {
-          text: '订单销售的趋势图',
-          left: 'center'
-        },
         tooltip: {
           trigger: 'axis'
         },
@@ -1666,30 +1650,72 @@ export default {
         data: {
           group:this.AnalysisGroupValue,
           aggregate:this.AnalysisAggregateValue,
-          data:this.tableData
+          data:this.tableData,
+          table:this.chart_tableName
         }
       }).then(response => {
         console.log(response.data)
+        response.data.series.forEach(seriesItem => {
+          if (seriesItem.label && typeof seriesItem.label.formatter === 'string') {
+            seriesItem.label.formatter = new Function('return ' + seriesItem.label.formatter)();
+          }
+        });
+
         this.bar_option.series = response.data.series
         this.bar_option.xAxis.data = response.data.xValues
 
         // 柱状图
-        let barDom = document.getElementById('bar-chart');
-        let barChart = echarts.init(barDom);
-        barChart.setOption(this.bar_option)
+        // let barDom = document.getElementById('bar-chart');
+        // let barChart = echarts.init(barDom);
+        // barChart.setOption(this.bar_option,true)
+        this.initializeBarChart()
+      }).catch(error => {
+        console.log(error);
+      })
 
+      //折线图
+      axios({
+        method: 'post',
+        url: 'http://localhost:10010/search/analysis/line',
+        data: {
+          group:this.AnalysisGroupValue,
+          aggregate:this.AnalysisAggregateValue,
+          data:this.tableData,
+          table:this.chart_tableName
+        }
+      }).then(response => {
+        console.log(response.data)
+        response.data.series.forEach(seriesItem => {
+          if (seriesItem.label && typeof seriesItem.label.formatter === 'string') {
+            seriesItem.label.formatter = new Function('return ' + seriesItem.label.formatter)();
+          }
+        });
+
+        this.line_option.series = response.data.series
+        this.line_option.xAxis.data = response.data.xValues
+
+        this.initializeLineChart()
       }).catch(error => {
         console.log(error);
       })
     },
 
     //图表
+    initializeBarChart() {
+      this.$nextTick(() => {
+        let bartDom = document.getElementById('bar-chart');
+        if (bartDom) {
+          let barChart = echarts.init(bartDom);
+          barChart.setOption(this.bar_option,true);
+        }
+      });
+    },
     initializeLineChart() {
       this.$nextTick(() => {
         let linetDom = document.getElementById('line-chart');
         if (linetDom) {
           let lineChart = echarts.init(linetDom);
-          lineChart.setOption(this.line_option);
+          lineChart.setOption(this.line_option,true);
         }
       });
     },
@@ -1698,7 +1724,7 @@ export default {
         let pieDom = document.getElementById('pie-chart');
         if (pieDom) {
           let pieChart = echarts.init(pieDom);
-          pieChart.setOption(this.pie_option);
+          pieChart.setOption(this.pie_option,true);
         }
       });
     },
@@ -1716,6 +1742,11 @@ export default {
 
   },
   watch: {
+    bar_display(newVal) {
+      if (newVal) {
+        this.initializeBarChart();
+      }
+    },
     line_display(newVal) {
       if (newVal) {
         this.initializeLineChart();
