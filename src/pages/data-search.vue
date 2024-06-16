@@ -1538,8 +1538,15 @@ export default {
         console.log(error);
       })
 
-      this.AnalysisGroupValueList = this.RelatedSearchIndexShowNameList
-      this.AnalysisAggregateValueList = this.RelatedSearchIndexShowNameList
+      if(this.RelatedShowIndexNameList.length === 0){
+        this.AnalysisGroupValueList = this.RelatedSearchIndexShowNameList
+        this.AnalysisAggregateValueList = this.RelatedSearchIndexShowNameList
+      }
+      else{
+        // 根据RelatedShowIndexNameList中的值筛选出对应的多选框选项
+        this.AnalysisGroupValueList = this.RelatedSearchIndexShowNameList.filter(item => this.RelatedShowIndexNameList.includes(item.attribute));
+        this.AnalysisAggregateValueList = this.RelatedSearchIndexShowNameList.filter(item => this.RelatedShowIndexNameList.includes(item.attribute));
+      }
 
       this.chart_tableName = this.RelatedSearchTableName1
       this.AnalysisAggregateValue = ''
@@ -1708,8 +1715,6 @@ export default {
       }).catch(error => {
         console.log(error);
       })
-      console.log(this.AnalysisGroupValue)
-      console.log(this.AnalysisAggregateValue)
     },
 
     //图表
