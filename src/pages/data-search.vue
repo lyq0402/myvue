@@ -623,6 +623,9 @@
             <div v-if="pie_display" id="pie-chart1" style="width: 800px; height: 600px;"></div>
             <div v-if="pie_display" id="pie-chart2" style="width: 800px; height: 600px;"></div>
           </div>
+<!--          <div style="margin-top: 20px; display: flex; justify-content: center;">-->
+<!--            <div v-if="pie_display" id="pie-chart2" style="width: 800px; height: 600px;"></div>-->
+<!--          </div>-->
 
           <div
               v-if="(bar_display || pie_display || line_display) || everAnalyzed"
@@ -946,6 +949,10 @@ export default {
       chart_tableName:'',
 
       bar_option : {//柱状图
+        title: {
+          text: '柱状图',
+          left: 'center'
+        },
         tooltip: {
           trigger: 'axis'
         },
@@ -964,6 +971,10 @@ export default {
         ]
       },
       line_option : { //折线图
+        title: {
+          text: '折线图',
+          left: 'center'
+        },
         tooltip: {
           trigger: 'axis'
         },
@@ -996,7 +1007,7 @@ export default {
 
       pie_option: {//饼状图1
         title: {
-          text: '订单销售统计',
+          text: '饼状图',
           subtext: '比例图',
           left: 'center'
         },
@@ -1008,30 +1019,16 @@ export default {
           left: 'left'
         },
         series: [
-          {
-            name: 'Access From',
-            type: 'pie',
-            center: ['50%', '60%'],
-            radius: '50%',
-            data: [
-              { value: 1048, name: 'Search Engine' },
-              { value: 735, name: 'Direct' },
-              { value: 580, name: 'Email' },
-              { value: 484, name: 'Union Ads' },
-              { value: 300, name: 'Video Ads' }
-            ],
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-              }
-            }
-          }
+
         ]
       },
 
       pie_option2: {//饼状图2
+        title: {
+          text: '饼状图',
+          subtext: '比例图',
+          left: 'center'
+        },
         tooltip: {
           trigger: 'item'
         },
@@ -1686,7 +1683,6 @@ export default {
           table:this.chart_tableName
         }
       }).then(response => {
-        console.log(response.data)
         response.data.series.forEach(seriesItem => {
           if (seriesItem.label && typeof seriesItem.label.formatter === 'string') {
             seriesItem.label.formatter = new Function('return ' + seriesItem.label.formatter)();
@@ -1742,14 +1738,11 @@ export default {
           table:this.chart_tableName
         }
       }).then(response => {
-        response.data.series.forEach(seriesItem => {
-          if (seriesItem.label && typeof seriesItem.label.formatter === 'string') {
-            seriesItem.label.formatter = new Function('return ' + seriesItem.label.formatter)();
-          }
-        });
 
         this.pie_option.series = response.data.series1
         this.pie_option2.series = response.data.series2
+        console.log(this.pie_option.series)
+        console.log(this.pie_option2.series)
 
         this.initializePieChart()
       }).catch(error => {

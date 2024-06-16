@@ -141,6 +141,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "menu-page",
   data(){
@@ -254,7 +256,18 @@ export default {
     },
     checkAPIName(){
       this.everChecked = true;
-        this.$message.error('进行检测');
+      axios({
+        method: 'post',
+        url: 'http://localhost:10010/api/checkname',
+        data: {
+          name: this.apiForm.name
+        }
+      }).then(response => {
+        this.APINameExisted = response.data
+
+      }).catch(error => {
+        console.log(error);
+      })
     }
   }
 }
