@@ -620,7 +620,8 @@
             <div v-if="line_display" id="line-chart" style="width: 1080px; height: 400px;"></div>
           </div>
           <div style="margin-top: 20px; display: flex; justify-content: center;">
-            <div v-if="pie_display" id="pie-chart" style="width: 800px; height: 600px;"></div>
+            <div v-if="pie_display" id="pie-chart1" style="width: 800px; height: 600px;"></div>
+            <div v-if="pie_display" id="pie-chart2" style="width: 800px; height: 600px;"></div>
           </div>
 
           <div
@@ -992,7 +993,8 @@ export default {
           }
         ]
       },
-      pie_option: {//饼状图
+
+      pie_option: {//饼状图1
         title: {
           text: '订单销售统计',
           subtext: '比例图',
@@ -1026,6 +1028,18 @@ export default {
               }
             }
           }
+        ]
+      },
+
+      pie_option2: {//饼状图2
+        tooltip: {
+          trigger: 'item'
+        },
+        legend: {
+          orient: 'vertical',
+          left: 'left'
+        },
+        series: [
         ]
       }
     }
@@ -1715,6 +1729,32 @@ export default {
       }).catch(error => {
         console.log(error);
       })
+
+
+      //饼状图
+      axios({
+        method: 'post',
+        url: 'http://localhost:10010/search/analysis/pie',
+        data: {
+          group:this.AnalysisGroupValue,
+          aggregate:this.AnalysisAggregateValue,
+          data:this.tableData,
+          table:this.chart_tableName
+        }
+      }).then(response => {
+        response.data.series.forEach(seriesItem => {
+          if (seriesItem.label && typeof seriesItem.label.formatter === 'string') {
+            seriesItem.label.formatter = new Function('return ' + seriesItem.label.formatter)();
+          }
+        });
+
+        this.pie_option.series = response.data.series1
+        this.pie_option2.series = response.data.series2
+
+        this.initializePieChart()
+      }).catch(error => {
+        console.log(error);
+      })
     },
 
     //图表
@@ -1738,10 +1778,17 @@ export default {
     },
     initializePieChart() {
       this.$nextTick(() => {
-        let pieDom = document.getElementById('pie-chart');
+        let pieDom = document.getElementById('pie-chart1');
         if (pieDom) {
           let pieChart = echarts.init(pieDom);
           pieChart.setOption(this.pie_option,true);
+        }
+      });
+      this.$nextTick(() => {
+        let pieDom = document.getElementById('pie-chart2');
+        if (pieDom) {
+          let pieChart = echarts.init(pieDom);
+          pieChart.setOption(this.pie_option2,true);
         }
       });
     },
