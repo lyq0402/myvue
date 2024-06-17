@@ -73,7 +73,7 @@
                         placeholder="请输入简洁、清晰的API名称"
               @blur="checkAPIName"></el-input>
               <i v-if="!APINameExisted && APIEverChecked" class="el-icon-check" style="color: green; font-size: 20px;"></i>
-              <i v-if="APINameExisted && APIEverChecked" class="el-icon-close" style="color: red; font-size: 14px;">该API名称已存在或者不合法</i>
+              <i v-if="APINameExisted && APIEverChecked" class="el-icon-close" style="color: red; font-size: 14px;">{{ APIWrongReason }}</i>
             </el-form-item>
             <el-form-item label="API描述:">
               <el-input type="textarea" v-model="apiForm.desc" :rows="6"
@@ -135,6 +135,7 @@ export default {
   name: "menu-page",
   data(){
     return{
+      APIWrongReason: '',
       APINameExisted: false,
       SQLLegal: false,
       APIEverChecked: false,
@@ -192,8 +193,9 @@ export default {
         judge = response.data.judge
         url = response.data.url
         if(judge){
-          this.$alert('您创建的API的URL为${url}，详情请查看“API详细信息查询”页面', '创建API成功', {
+          this.$alert(`您创建的API的URL为${url}，详情请查看“API详细信息查询”页面`, '创建API成功', {
             confirmButtonText: '确定',
+            center: true,
             callback: action => {
               this.$message({
                 type: 'info',
@@ -206,6 +208,7 @@ export default {
         else{
           this.$alert('创建API失败，请检查您的输入是否合法', '创建API失败', {
             confirmButtonText: '确定',
+            center: true,
             callback: action => {
               this.$message({
                 type: 'info',
@@ -228,14 +231,16 @@ export default {
           name: this.apiForm.name
         }
       }).then(response => {
-        this.APINameExisted = response.data
+        this.APINameExisted = !(response.data.judgeName && response.data.judgeSpace)
+        if(!response.data.judgeName){
+          this.APIWrongReason = 'API名称不合法'
+        }
+        if(!response.data.judgeSpace){
+          this.APIWrongReason = 'API名称不能包含空格'
+        }
       }).catch(error => {
         console.log(error);
       })
-
-      if(this.apiForm.name.trim() === ''){
-        this.APINameExisted = true
-      }
     },
     checkSQL(){
       this.SQLEverChecked = true;
@@ -246,7 +251,7 @@ export default {
           sql: this.apiForm.sql
         }
       }).then(response => {
-        this.SQLLegal = response.data
+        this.SQLLegal = !response.data
       }).catch(error => {
         console.log(error);
       })
