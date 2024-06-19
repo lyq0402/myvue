@@ -91,12 +91,12 @@
                   active-text="全字匹配"
                   inactive-text="非全字匹配">
               </el-switch>
-              <el-button style="margin-left: 30px" round type="primary" icon="el-icon-search">搜索</el-button>
+              <el-button style="margin-left: 30px" @click = "search" round type="primary" icon="el-icon-search">搜索</el-button>
             </el-row>
 
           </div>
           <div style="margin-top: 20px">
-            <el-table :data="tableData"  class="centered-table" :fit="true" >
+            <el-table :data="pagedData"  class="centered-table" :fit="true" >
               <el-table-column
                   stripe
                   border
@@ -105,8 +105,27 @@
                   :prop="column.attribute"
                   :label="column.translation"
                   :width="getColumnWidth(column.attribute)"
+                  :resizable="column.resizable"
+                  :show-overflow-tooltip="true"
               ></el-table-column>
+              <!-- 使用 v-slot 替代 slot-scope -->
+              <el-table-column label="操作" width="100px">
+                <template v-slot="scope">
+                  <el-button type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)"></el-button>
+                </template>
+              </el-table-column>
             </el-table>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <el-pagination
+                  @size-change="handleSizeChange"
+                  @current-change="handleCurrentChange"
+                  :current-page.sync="currentPage"
+                  :page-sizes="[10, 20, 30, 40]"
+                  :page-size="pageSize"
+                  layout="total, sizes, prev, pager, next, jumper"
+                  :total="tableData.length"
+              ></el-pagination>
+            </div>
           </div>
         </el-main>
 
@@ -118,69 +137,59 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "menu-page",
   data(){
     return{
+      selectedRow: '',
+      pageSize:10,
+      currentPage: 1,
       isCollapse:false,
       asideWidth: '200px',
       searchData:'',
       checkType:false,
       searchType:'',
+      pagedData: [],
       searchTypes:[
         {
-          value: '1',
+          value: 'api_name',
           label: '名称查询'
         },
         {
-          value: '2',
-          label: 'URL查询'
-        },
-        {
-          value: '3',
+          value: 'api_business',
           label: '业务方查询'
         },
-        {
-          value: '4',
-          label: '功能查询'
-        }
       ],
       dynamicColumns: [
         {
-          attribute: 'apiName',
-          translation: 'api名称'
+          attribute: 'date',
+          translation: '日期'
+        },
+          {
+          attribute: 'name',
+          translation: '姓名'
         },
         {
-          attribute: 'apiIntroduction',
-          translation: 'api描述'
-        },
-        {
-          attribute: 'Request_method',
-          translation: '请求方式'
-        },
-        {
-          attribute: 'database_type',
-          translation: '数据库类型'
-        },
-        {
-          attribute: 'request_header',
-          translation: '请求头参数'
-        },
-        {
-          attribute: 'Identity_information',
-          translation: '身份验证信息'
-        },
-        {
-          attribute: 'outTime',
-          translation: '超时终止'
-        },
-        {
-          attribute: 'customers',
-          translation: '业务用户'
+          attribute: 'address',
+          translation: '地址'
         }
       ],
       tableData: [
-
+        {
+          date: '2016-05-03',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }, {
+          date: '2016-05-02',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }, {
+          date: '2016-05-04',
+          name: '王小虎',
+          address: '上海市普陀区金沙江路 1518 弄'
+        }
       ]
     }
   },
@@ -197,6 +206,69 @@ export default {
         return Math.max(max, value.length);
       }, 0);
     },
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.handleCurrentChange(1); // 切换每页条数时回到第一页
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      const startIndex = (val - 1) * this.pageSize;
+      const endIndex = startIndex + this.pageSize;
+      this.pagedData = this.tableData.slice(startIndex, endIndex);
+    },
+    handleDelete(row) {
+      axios({
+        method: 'post',
+        url: 'http://localhost:10010/api/delete',
+        data: {
+          name:row.api_name
+        }
+      }).then(response => {
+        let status = response.data
+        if(status){
+          this.search()
+        }
+        else {
+          this.$message.error('删除失败')
+        }
+      }).catch(error => {
+        console.log(error);
+      })
+      console.log('Deleted row:', row.name);
+    },
+
+    search(){
+      let type = ''
+      if(this.checkType){
+        type = '全字搜索'
+      }
+      axios({
+        method: 'post',
+        url: 'http://localhost:10010/api/selectInfo',
+        data: {
+          attribute: this.searchType,
+          value: this.searchData,
+          type: type
+        }
+      }).then(response => {
+        this.tableData = response.data;
+        this.pagedData =  this.tableData.slice(0, this.pageSize);
+      }).catch(error => {
+        console.log(error);
+      })
+    }
+  },
+
+  mounted() {
+    axios.post('http://localhost:10010/api/info')
+        .then(response => {
+          this.dynamicColumns =  response.data.mapping;
+          this.tableData = response.data.data;
+          this.pagedData =  this.tableData.slice(0, this.pageSize);
+        })
+        .catch(error => {
+          console.log(error)
+        })
   }
 }
 

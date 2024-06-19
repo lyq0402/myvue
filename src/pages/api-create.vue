@@ -85,8 +85,8 @@
                         placeholder="请输入具体的SQL语言,对数据库的操作包括查看，返回修改数据等"
                         @blur="checkSQL"
                         style="margin-left: 20px; width: 500px; height: 140px;"></el-input>
-              <i v-if="!SQLLegal && SQLEverChecked " class="el-icon-check" style="color: green; font-size: 20px;"></i>
-              <i v-if="SQLLegal && SQLEverChecked " class="el-icon-close" style="color: red; font-size: 14px;">您输入的SQL语言不合法</i>
+              <i v-if="SQLLegal && SQLEverChecked " class="el-icon-check" style="color: green; font-size: 20px;"></i>
+              <i v-if="!SQLLegal && SQLEverChecked " class="el-icon-close" style="color: red; font-size: 14px;">您输入的SQL语言不合法</i>
             </el-form-item>
 
             <el-form-item label="数据库类型:">
@@ -178,6 +178,18 @@ export default {
   },
   methods:{
     onSubmit() {
+      if(this.APINameExisted){
+        this.$message.error('API名称不合法，请检查您的输入是否合法')
+        return;
+      }
+      if(!this.SQLLegal){
+        this.$message.error('SQL语言不合法，请检查您的输入是否合法')
+        return;
+      }
+      if(this.apiForm.databaseType === ''){
+        this.$message.error('请选择数据库类型')
+        return;
+      }
       let judge = false;
       let url = '';
       axios({
@@ -238,6 +250,9 @@ export default {
         if(!response.data.judgeSpace){
           this.APIWrongReason = 'API名称不能包含空格'
         }
+        if(this.apiForm.name.length === 0){
+          this.APIWrongReason = 'API名称不能为空'
+        }
       }).catch(error => {
         console.log(error);
       })
@@ -251,7 +266,7 @@ export default {
           sql: this.apiForm.sql
         }
       }).then(response => {
-        this.SQLLegal = !response.data
+        this.SQLLegal = response.data
       }).catch(error => {
         console.log(error);
       })
