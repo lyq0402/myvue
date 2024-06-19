@@ -614,10 +614,10 @@
           </div>
 
           <div style="margin-top: 20px; display: flex; justify-content: center;">
-            <div v-if="bar_display" id="bar-chart" style="width: 1080px;height:400px;"></div>
+            <div v-if="bar_display" id="bar-chart" style="width: 100%;height:400px;"></div>
           </div>
           <div style="margin-top: 20px; display: flex; justify-content: center;">
-            <div v-if="line_display" id="line-chart" style="width: 1080px; height: 400px;"></div>
+            <div v-if="line_display" id="line-chart" style="width: 100%; height: 400px;"></div>
           </div>
           <div style="margin-top: 20px; display: flex; justify-content: center;">
             <div v-if="pie_display" id="pie-chart1" style="width: 800px; height: 600px;"></div>

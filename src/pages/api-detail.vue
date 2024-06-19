@@ -150,7 +150,7 @@ export default {
       asideWidth: '200px',
       searchData:'',
       checkType:false,
-      searchType:'',
+      searchType:'api_name',
       pagedData: [],
       searchTypes:[
         {
@@ -227,6 +227,9 @@ export default {
         let status = response.data
         if(status){
           this.search()
+          this.$message.success('删除成功')
+          this.handleSizeChange(this.currentPage)
+
         }
         else {
           this.$message.error('删除失败')
