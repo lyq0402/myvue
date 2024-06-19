@@ -108,7 +108,6 @@
                   :resizable="column.resizable"
                   :show-overflow-tooltip="true"
               ></el-table-column>
-              <!-- 使用 v-slot 替代 slot-scope -->
               <el-table-column label="操作" width="100px">
                 <template v-slot="scope">
                   <el-button type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)"></el-button>
@@ -226,10 +225,12 @@ export default {
       }).then(response => {
         let status = response.data
         if(status){
-          this.search()
           this.$message.success('删除成功')
-          this.handleSizeChange(this.currentPage)
-
+          // 在这里实现删除操作，可以根据需要调用 API 或者直接操作数据源
+          const index = this.pagedData.indexOf(row);
+          if (index !== -1) {
+            this.pagedData.splice(index, 1); // 从数据源中移除该行数据
+          }
         }
         else {
           this.$message.error('删除失败')
@@ -237,7 +238,6 @@ export default {
       }).catch(error => {
         console.log(error);
       })
-      console.log('Deleted row:', row.name);
     },
 
     search(){
