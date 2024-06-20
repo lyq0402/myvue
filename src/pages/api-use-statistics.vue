@@ -69,38 +69,45 @@
         <el-main>
           <div style="margin-top: 30px">
             <el-row>
-              <el-select v-model="apiName" style="margin-left: 20px;
+              <el-select v-model="apiName" filterable style="margin-left: 20px;
               margin-right: 20px; font-size: 25px;" placeholder="请选择API名称"
               @change="apiNameChange">
                 <el-option
                     v-for="item in apiNames"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                </el-option>
-              </el-select>
-              <el-select v-model="userName" style="margin-left: 20px; margin-right: 20px; font-size: 25px;" placeholder="请选择业务用户">
-                <el-option
-                    v-for="item in userNames"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
+                    :key="item.api_name"
+                    :label="item.api_name"
+                    :value="item.api_name">
                 </el-option>
               </el-select>
               <span style="font-size: 20px;" >
                 状态：<span :style="{ color: statusColor }">{{status}}</span>
               </span>
-              <el-date-picker
-                  style="margin-left: 30px"
-                  v-model="dateRange"
-                  type="daterange"
-                  range-separator="至"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期">
-              </el-date-picker>
+
+              <span style="margin-left: 3%; font-size: 20px;" >
+                业务用户：{{businessUser}}
+              </span>
+
+              <template>
+                <span style="margin-left: 5%; font-size: 20px;">近期使用情况：</span>
+
+                <el-select @change = "DrawCharts" style="font-size: 25px;" v-model="DateType" placeholder="请选择">
+                  <el-option
+                      v-for="item in DateTypes"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value">
+                  </el-option>
+                </el-select>
+              </template>
+
             </el-row>
-            <el-row  style="margin-top: 20px;">
-              <span style="font-size: 20px">
+            <el-row style=" margin-top: 20px;">
+              <span style="margin-left: 20px; font-size: 20px">
+                URL:{{API_URL}}
+              </span>
+            </el-row>
+            <el-row  style=" margin-top: 20px;">
+              <span style=" margin-left: 20px; font-size: 20px">
                 功能描述：
               </span>
               <el-input
@@ -127,6 +134,12 @@
               <el-button type="danger" round>禁用</el-button>
             </el-row>
           </div>
+          <div style="margin-top: 20px; display: flex; justify-content: center;">
+            <div id="bar-chart" style="width: 100%;height:400px;"></div>
+          </div>
+          <div style="margin-top: 20px; display: flex; justify-content: center;">
+            <div  id="pie-chart" style="width: 800px; height: 600px;"></div>
+          </div>
         </el-main>
 
 
@@ -138,11 +151,15 @@
 
 <script>
 import axios from "axios";
+import * as echarts from "echarts";
 
 export default {
   name: "menu-page",
   data(){
     return{
+      businessUser:'',
+      API_URL:'',
+      DateType:'最近一天',
       isCollapse:false,
       asideWidth: '200px',
       apiName:'',
@@ -152,132 +169,175 @@ export default {
       userName:'',
       description:'这里填写对应API的功能介绍和需要注意的事项',
       dateRange:[],
+      DateTypes:[
+        {
+          value: '最近一天',
+          label: '最近一天'
+        },
+        {
+          value: '最近一个星期',
+          label: '最近一周'
+        },
+        {
+          value: '最近一个月',
+          label: '最近一月'
+        }
+      ],
       userNames:[
         {
           value: 'user1',
           label: 'user1'
         },
-        {
-          value: 'user2',
-          label: 'user2'
-        },
-        {
-          value: 'user3',
-          label: 'user3'
-        },
-        {
-          value: 'user4',
-          label: 'user4'
-        },
-        {
-          value: 'user5',
-          label: 'user5'
-        },
-        {
-          value: 'user6',
-          label: 'user6'
-        },
-        {
-          value: 'user7',
-          label: 'user7'
-        },
-        {
-          value: 'user8',
-          label: 'user8'
-        },
-        {
-          value: 'user9',
-          label: 'user9'
-        },
-        {
-          value: 'user10',
-          label: 'user10'
-        },
-        {
-          value: 'user11',
-          label: 'user11'
-        },
-        {
-          value: 'user12',
-          label: 'user12'
-        },
         ],
       apiNames:[
-        {
-          value: 'api1',
-          label: 'api1'
+
+        ],
+
+      //画表
+      bar_option : {//柱状图
+        title: {
+          text: '柱状图',
+          left: 'center'
         },
-        {
-          value: 'api2',
-          label: 'api2'
+        tooltip: {
+          trigger: 'axis'
         },
-        {
-          value: 'api3',
-          label: 'api3'
+        legend: {
+          left: 'left'
         },
-        {
-          value: 'api4',
-          label: 'api4'
+        xAxis: {
+          type: 'category',
+          data: []
         },
-        {
-          value: 'api5',
-          label: 'api5'
+        yAxis: {
+          type: 'value'
         },
-        {
-          value: 'api6',
-          label: 'api6'
-        },
-        {
-          value: 'api7',
-          label: 'api7'
-        },
-        {
-          value: 'api8',
-          label: 'api8'
-        },
-        {
-          value: 'api9',
-          label: 'api9'
-        },
-        {
-          value: 'api10',
-          label: 'api10'
-        },
-        {
-          value: 'api11',
-          label: 'api11'
-        },
-        {
-          value: 'api12',
-          label: 'api12'
-        },
+        series: [
+
         ]
+      },
+
+      pie_option: {//饼状图
+        title: {
+          text: '饼状图',
+          subtext: '比例图',
+          left: 'center'
+        },
+        tooltip: {
+          trigger: 'item'
+        },
+        legend: {
+          orient: 'vertical',
+          left: 'left'
+        },
+        series: [
+
+        ]
+      },
+
     }
   },
   methods:{
     apiNameChange(){
       axios({
         method: 'post',
-        url: '/api-users',
+        url: 'http://localhost:10010/api/getConcreteInfo',
         data: {
-          APIName: this.apiName
+          name: this.apiName
         }
       }).then(response => {
-        this.userNames = response.data.userNames;
+        console.log(response.data)
+        this.description = response.data.api_info
+        this.status = response.data.api_status
+        this.API_URL = response.data.api_url
+        this.businessUser = response.data.api_business
+        if(response.data.api_status === '运行'){
+          this.statusColor = '#67c23a'
+        }
+        else{
+          this.statusColor = '#f56c6c'
+        }
+
       }).catch(error => {
         console.log(error)
       })
-    }
+
+
+      axios({
+        method: 'post',
+        url: 'http://localhost:10010/api/getConcreteChartsInfo',
+        data: {
+          type:this.DateType,
+          name: this.apiName
+        }
+      }).then(response => {
+
+        this.bar_option.series = response.data.bar
+        this.bar_option.xAxis.data = response.data.xValues
+        this.pie_option.series = response.data.pie
+        this.initializePieChart()
+        this.initializeBarChart()
+      }).catch(error => {
+        console.log(error);
+      })
+
+
+    },
+
+    DrawCharts(){
+      axios({
+        method: 'post',
+        url: 'http://localhost:10010/api/getConcreteChartsInfo',
+        data: {
+          type:this.DateType,
+          name: this.apiName
+        }
+      }).then(response => {
+
+
+        this.bar_option.series = response.data.bar
+        this.bar_option.xAxis.data = response.data.xValues
+        this.pie_option.series = response.data.pie
+        this.initializePieChart()
+        this.initializeBarChart()
+      }).catch(error => {
+        console.log(error);
+      })
+    },
+
+    initializeBarChart() {
+      this.$nextTick(() => {
+        let bartDom = document.getElementById('bar-chart');
+        if (bartDom) {
+          let barChart = echarts.init(bartDom);
+          barChart.setOption(this.bar_option,true);
+        }
+      });
+    },
+    initializePieChart() {
+      this.$nextTick(() => {
+        let pieDom = document.getElementById('pie-chart');
+        if (pieDom) {
+          let pieChart = echarts.init(pieDom);
+          pieChart.setOption(this.pie_option,true);
+        }
+      });
+    },
 
   },
   mounted(){
-    axios.get('/table_data')
-        .then(response => {
-          this.apiNames = response.data.apiNames;
-        })
-        .catch(error => {
-          console.log(error)
-        })
+    axios({
+      method: 'post',
+      url: 'http://localhost:10010/api/getNameList',
+      data: {
+        value:'',
+      }
+    }).then(response => {
+      this.apiNames = response.data;
+      console.log(response.data)
+    }).catch(error => {
+      console.log(error);
+    })
   }
 }
 

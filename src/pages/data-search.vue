@@ -621,11 +621,10 @@
           </div>
           <div style="margin-top: 20px; display: flex; justify-content: center;">
             <div v-if="pie_display" id="pie-chart1" style="width: 800px; height: 600px;"></div>
+          </div>
+          <div style="margin-top: 20px; display: flex; justify-content: center;">
             <div v-if="pie_display" id="pie-chart2" style="width: 800px; height: 600px;"></div>
           </div>
-<!--          <div style="margin-top: 20px; display: flex; justify-content: center;">-->
-<!--            <div v-if="pie_display" id="pie-chart2" style="width: 800px; height: 600px;"></div>-->
-<!--          </div>-->
 
           <div
               v-if="(bar_display || pie_display || line_display) || everAnalyzed"
@@ -951,7 +950,8 @@ export default {
       bar_option : {//柱状图
         title: {
           text: '柱状图',
-          left: 'center'
+          left: 'center',
+          top: '5%' // 调整这个值以确保标题不被挡住
         },
         tooltip: {
           trigger: 'axis'
@@ -973,7 +973,8 @@ export default {
       line_option : { //折线图
         title: {
           text: '折线图',
-          left: 'center'
+          left: 'center',
+          top: '5%' // 调整这个值以确保标题不被挡住
         },
         tooltip: {
           trigger: 'axis'

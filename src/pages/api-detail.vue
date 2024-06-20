@@ -216,28 +216,39 @@ export default {
       this.pagedData = this.tableData.slice(startIndex, endIndex);
     },
     handleDelete(row) {
-      axios({
-        method: 'post',
-        url: 'http://localhost:10010/api/delete',
-        data: {
-          name:row.api_name
-        }
-      }).then(response => {
-        let status = response.data
-        if(status){
-          this.$message.success('删除成功')
-          // 在这里实现删除操作，可以根据需要调用 API 或者直接操作数据源
-          const index = this.pagedData.indexOf(row);
-          if (index !== -1) {
-            this.pagedData.splice(index, 1); // 从数据源中移除该行数据
+      this.$confirm('此操作将永久删除该API, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true
+      }).then(() => {
+        // 用户点击确定按钮后执行的操作
+        axios({
+          method: 'post',
+          url: 'http://localhost:10010/api/delete',
+          data: {
+            name: row.api_name
           }
-        }
-        else {
-          this.$message.error('删除失败')
-        }
-      }).catch(error => {
-        console.log(error);
-      })
+        }).then(response => {
+          let status = response.data;
+          if (status) {
+            this.$message.success('删除成功');
+            this.search(); // 重新获取数据
+            this.currentPage = 1; // 恢复到第一页
+          } else {
+            this.$message.error('删除失败');
+          }
+        }).catch(error => {
+          console.log(error);
+          this.$message.error('删除失败，请稍后重试');
+        });
+      }).catch(() => {
+        // 用户点击取消按钮后执行的操作
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
     },
 
     search(){

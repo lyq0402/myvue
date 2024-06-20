@@ -104,7 +104,7 @@
                                :min="0" :max="300" :step="1" step-strictly></el-input-number> ms
             </el-form-item>
             <el-form-item label="业务用户:">
-              <el-select style="margin-left: 20px" v-model="apiForm.user" multiple placeholder="请选择">
+              <el-select style="margin-left: 20px" v-model="apiForm.user"  placeholder="请选择">
                 <el-option
                     v-for="item in userList"
                     :key="item.value"
@@ -132,7 +132,7 @@
 import axios from "axios";
 
 export default {
-  name: "menu-page",
+  name: "api-create-page",
   data(){
     return{
       APIWrongReason: '',
