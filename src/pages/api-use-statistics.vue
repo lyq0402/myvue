@@ -130,8 +130,8 @@
               <el-col  :span="2" style="margin-left: 20px">
                 <el-button type="primary" round>确定</el-button>
               </el-col>
-              <el-button style="margin-left: 600px;" type="success" round>启用</el-button>
-              <el-button type="danger" round>禁用</el-button>
+              <el-button @click = "openAPI"  style="margin-left: 600px;" type="success" round>启用</el-button>
+              <el-button @click = "closeAPI" type="danger" round>禁用</el-button>
             </el-row>
           </div>
           <div style="margin-top: 20px; display: flex; justify-content: center;">
@@ -323,6 +323,39 @@ export default {
         }
       });
     },
+
+    openAPI(){
+      axios({
+        method: 'post',
+        url: 'http://localhost:10010/api/open',
+        data: {
+          name: this.apiName
+        }
+      }).then(response => {
+        console.log(response.data)
+        this.status = '运行'
+        this.statusColor = '#67c23a'
+
+      }).catch(error => {
+        console.log(error)
+      })
+    },
+    closeAPI(){
+      axios({
+        method: 'post',
+        url: 'http://localhost:10010/api/close',
+        data: {
+          name: this.apiName
+        }
+      }).then(response => {
+        console.log(response.data)
+        this.status = '禁用'
+        this.statusColor = '#f56c6c'
+
+      }).catch(error => {
+        console.log(error)
+      })
+    }
 
   },
   mounted(){
