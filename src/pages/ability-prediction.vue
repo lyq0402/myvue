@@ -75,12 +75,14 @@
               选择学生：
               <el-select v-model="StudentID" filterable placeholder="请选择">
                 <el-option
+                    @change = "StudentDataShow"
                     v-for="item in StudentIDList"
-                    :key="item.attribute"
-                    :label="item.attribute"
-                    :value="item.attribute">
+                    :key="item.stu_number"
+                    :label="item.stu_number"
+                    :value="item.stu_number">
                 </el-option>
               </el-select>
+              {{StudentData}}
             </div>
           </el-row>
           <el-row style="margin-top: 20px;">
@@ -151,10 +153,11 @@ export default {
   data(){
     return{
       props: { multiple: true },
-      StudentID: '21567890',
+      StudentData: '',
+      StudentID: '',
       StudentIDList: [
         {
-          attribute: '1501010101'
+          stu_number: '1501010101'
         }],
       checked: false,
       checkedList: [], // 初始化为空数组，用来存储选中的复选框
@@ -215,7 +218,7 @@ export default {
           top: '5%' // 调整这个值以确保标题不被挡住
         },
         tooltip: {
-          trigger: 'axis'
+          trigger: 'item'
         },
         legend: {
           left: 'center',
@@ -269,6 +272,15 @@ export default {
       // Example: Display checked items in an alert
       alert('Checked items:\n' + checkedItems.map(item => item.value).join('\n'));
     },
+    StudentDataShow(){
+      axios.post('http://localhost:10010/stuAbility/selectStuData',{
+        stuNumber:this.StudentID
+      }).then(response => {
+        this.StudentData = response.data;
+      }).catch(error => {
+        console.log(error)
+      })
+    },
     DrawRadar(){
       // 使用 map 方法遍历 RadarShows 中的每个子数组，并提取最后一个元素
       const dimension = this.RadarShows.map(arr => arr[arr.length - 1]);
@@ -294,6 +306,7 @@ export default {
       }).then(response => {
         this.radar_option.series = response.data.series;
         this.radar_option.radar.indicator = response.data.indicator;
+        this.radar_option.legend.data = response.data.legend;
         this.initializeRadarChart();
       }).catch(error => {
         console.log(error);
@@ -319,6 +332,14 @@ export default {
     axios.post('http://localhost:10010/stuAbility/selectList')
         .then(response => {
           this.RadarShowList = response.data;
+        })
+        .catch(error => {
+          console.log(error)
+        })
+
+    axios.post('http://localhost:10010/stuAbility/getStuNumList')
+        .then(response => {
+          this.StudentIDList = response.data;
         })
         .catch(error => {
           console.log(error)
