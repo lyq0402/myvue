@@ -1,85 +1,78 @@
 <template>
-  <div>
-    <div v-if="pie_display" id="pie-chart" style="width: 600px; height: 400px;"></div>
-    <button @click="togglePieDisplay">Toggle Pie Display</button>
-  </div>
+  <el-container>
+    <el-header class="custom-header">
+      <div class="header-content">
+        <h1 class="header-title">学生学业能力维度观测</h1>
+      </div>
+      <el-button type="text" class="logout-button" @click="handleLogout">退出</el-button>
+    </el-header>
+
+
+    <el-main>
+      <el-row :gutter="10">
+        <el-col :span="8">
+          <el-card>
+            <div class="custom-content">
+              <i class="el-icon-trophy"></i>
+              我的职业能力(近三年）
+            </div>
+            <div style="margin-top: 15px; font-size: 15px; font-weight: bold; font-family: '微软雅黑', cursive;">
+              选择我的能力
+            </div>
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card>
+            aa
+          </el-card>
+        </el-col>
+        <el-col :span="8">
+          <el-card>
+            aa
+          </el-card>
+        </el-col>
+      </el-row>
+    </el-main>
+  </el-container>
 </template>
 
 <script>
-import * as echarts from 'echarts';
-
 export default {
-  data() {
-    return {
-      pie_display: false,
-      pie_option: {
-        title: {
-          text: '订单销售统计',
-          subtext: '比例图',
-          left: 'center'
-        },
-        tooltip: {
-          trigger: 'item'
-        },
-        legend: {
-          orient: 'vertical',
-          left: 'left'
-        },
-        series: [
-          {
-            name: 'Access From',
-            type: 'pie',
-            center: ['50%', '60%'],
-            radius: '50%',
-            data: [
-              { value: 1048, name: 'Search Engine' },
-              { value: 735, name: 'Direct' },
-              { value: 580, name: 'Email' },
-              { value: 484, name: 'Union Ads' },
-              { value: 300, name: 'Video Ads' }
-            ],
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-              }
-            }
-          }
-        ]
-      }
-    };
-  },
   methods: {
-    togglePieDisplay() {
-      this.pie_display = !this.pie_display;
-    },
-    initializePieChart() {
-      this.$nextTick(() => {
-        let pieDom = document.getElementById('pie-chart');
-        if (pieDom) {
-          let pieChart = echarts.init(pieDom);
-          pieChart.setOption(this.pie_option);
-        }
-      });
-    }
-  },
-  watch: {
-    pie_display(newVal) {
-      if (newVal) {
-        this.initializePieChart();
-      }
-    }
-  },
-  mounted() {
-    // 如果初始值为 true，则初始化图表
-    if (this.pie_display) {
-      this.initializePieChart();
+    handleLogout() {
+      // 处理退出逻辑，例如跳转到登录页面或者清空用户信息等
+      console.log("Logout clicked");
     }
   }
 };
 </script>
 
 <style scoped>
-/* 你的样式 */
+.custom-header {
+  background-color: #409EFF; /* 自定义背景颜色 */
+  color: white; /* 字体颜色 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px; /* 设置高度 */
+  padding: 0 20px; /* 可选：为内容添加一些内边距 */
+}
+
+.header-content {
+  flex: 1; /* 占据剩余空间 */
+  text-align: center; /* 文字居中 */
+}
+
+.header-title {
+  margin: 0; /* 去除默认的外边距 */
+}
+
+.logout-button {
+  color: white; /* 将按钮字体颜色设置为白色 */
+}
+
+.custom-content {
+  font-size: 18px; /* 调整字体大小 */
+  color: green;   /* 更改字体颜色 */
+}
 </style>

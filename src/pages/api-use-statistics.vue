@@ -38,6 +38,10 @@
             <i class="el-icon-coin"></i>
             <span slot="title">统一库管理</span>
           </el-menu-item>
+          <el-menu-item index="/ability-prediction">
+            <i class="el-icon-s-opportunity"></i>
+            <span slot="title">学生学业能力维度观测</span>
+          </el-menu-item>
         </el-menu>
 
       </el-aside>
@@ -336,6 +340,18 @@ export default {
         this.status = '运行'
         this.statusColor = '#67c23a'
 
+        this.$alert('已成功启动API', '成功', {
+          confirmButtonText: '确定',
+          callback: action => {
+            if (action === 'confirm') {
+              this.$message({
+                type: 'success',
+                message: 'API已成功启用'
+              });
+            }
+          }
+        });
+
       }).catch(error => {
         console.log(error)
       })
@@ -351,6 +367,18 @@ export default {
         console.log(response.data)
         this.status = '禁用'
         this.statusColor = '#f56c6c'
+
+        this.$alert('已成功禁用API', '成功', {
+          confirmButtonText: '确定',
+          callback: action => {
+            if (action === 'confirm') {
+              this.$message({
+                type: 'success',
+                message: 'API已成功禁用'
+              });
+            }
+          }
+        });
 
       }).catch(error => {
         console.log(error)

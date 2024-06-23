@@ -75,6 +75,11 @@ const routes = [
     name: 'chart_test',
     component: () => import(/* webpackChunkName: "about" */ '../views/charts_test.vue')
   },
+  {
+    path: '/ability-prediction',
+    name: 'ability-prediction',
+    component: () => import(/* webpackChunkName: "about" */ '../pages/ability-prediction.vue')
+  },
 
   {
     path: '/',

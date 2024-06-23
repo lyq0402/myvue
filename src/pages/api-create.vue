@@ -38,6 +38,10 @@
             <i class="el-icon-coin"></i>
             <span slot="title">统一库管理</span>
           </el-menu-item>
+          <el-menu-item index="/ability-prediction">
+            <i class="el-icon-s-opportunity"></i>
+            <span slot="title">学生学业能力维度观测</span>
+          </el-menu-item>
         </el-menu>
 
       </el-aside>
@@ -261,7 +265,7 @@ export default {
       this.SQLEverChecked = true;
       axios({
         method: 'post',
-        url: 'http://localhost:10010/api/check',
+        url: 'http://localhost:10010/api/checksql',
         data: {
           sql: this.apiForm.sql
         }

@@ -38,6 +38,10 @@
             <i class="el-icon-coin"></i>
             <span slot="title">统一库管理</span>
           </el-menu-item>
+          <el-menu-item index="/ability-prediction">
+            <i class="el-icon-s-opportunity"></i>
+            <span slot="title">学生学业能力维度观测</span>
+          </el-menu-item>
         </el-menu>
 
       </el-aside>
@@ -626,6 +630,12 @@
             <div v-if="pie_display" id="pie-chart2" style="width: 800px; height: 600px;"></div>
           </div>
 
+          <div>
+            <el-row style="margin-top: 20px; display: flex; justify-content: center; align-items: center;">
+              <div v-html="formattedDescription" style="text-align: center; font-size: 16px; line-height: 1.5;"></div>
+            </el-row>
+          </div>
+
           <div
               v-if="(bar_display || pie_display || line_display) || everAnalyzed"
               style="display: flex; justify-content: center; align-items: center; margin-top: 10px; height: 100px;">
@@ -640,9 +650,6 @@
               <el-button @click = "subscribe" type="success" icon="el-icon-collection" round>订阅</el-button>
             </div>
           </div>
-
-
-
 
         </el-main>
 
@@ -712,6 +719,7 @@ export default {
       AnalysisAggregateValueList:[],
       AnalysisGroupValue:'',
       AnalysisGroupValueList:[],
+
       RelatedSearchIndexShowNameList: [{
         value: '选项1',
         label: '展示属性1'
@@ -1039,7 +1047,8 @@ export default {
         },
         series: [
         ]
-      }
+      },
+      description : ''
     }
   },
   methods:{
@@ -1749,6 +1758,24 @@ export default {
       }).catch(error => {
         console.log(error);
       })
+
+      //饼状图
+      axios({
+        method: 'post',
+        url: 'http://localhost:10010/search/analysis/all',
+        data: {
+          group:this.AnalysisGroupValue,
+          aggregate:this.AnalysisAggregateValue,
+          data:this.tableData,
+          table:this.chart_tableName
+        }
+      }).then(response => {
+        this.description = response.data
+      }).catch(error => {
+        console.log(error);
+      })
+
+
     },
 
     //图表
@@ -1815,6 +1842,12 @@ export default {
         this.initializePieChart();
       }
     },
+  },
+  computed: {
+    formattedDescription() {
+      // 将逗号替换为换行符，并用 <br> 标签包裹
+      return this.description.split(',').join('<br>');
+    }
   },
   mounted() {
     axios.get('http://localhost:10010/search/table')
