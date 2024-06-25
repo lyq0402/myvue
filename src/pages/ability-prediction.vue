@@ -73,9 +73,8 @@
           <el-row>
             <div style=" margin-left: 10px; font-size: 20px; font-weight: bold; font-family: '微软雅黑', cursive;">
               选择学生：
-              <el-select v-model="StudentID" filterable placeholder="请选择">
+              <el-select @change = "StudentDataShow" v-model="StudentID" filterable placeholder="请选择">
                 <el-option
-                    @change = "StudentDataShow"
                     v-for="item in StudentIDList"
                     :key="item.stu_number"
                     :label="item.stu_number"
@@ -92,7 +91,7 @@
             </div>
           </el-row>
           <el-row :gutter="10">
-            <el-col :span="6">
+            <el-col :span="10">
               <el-card>
                 <div style=" margin-left: 10px; font-size: 15px; font-weight: bold; font-family: '微软雅黑', cursive;">
                   选择我的能力
@@ -110,7 +109,7 @@
                 </div>
               </el-card>
             </el-col>
-            <el-col :span="10">
+            <el-col :span="14">
               <el-card>
 
                 <div class="block">
@@ -124,16 +123,45 @@
 
 
                 <div style="margin-top: 20px; display: flex; justify-content: center;">
-                  <div  id="radar-chart" style="width: 800px; height: 600px;"></div>
+                  <div  id="radar-chart" style="width: 1200px; height: 400px;"></div>
                 </div>
               </el-card>
             </el-col>
-            <el-col :span="8">
-              <el-card>
-                aa
-              </el-card>
-            </el-col>
           </el-row>
+
+          <div>
+            <el-row style="text-align: center; margin-left: 10px; margin-bottom: 15px; font-size: 20px; font-weight: bold; font-family: '楷体', cursive;">
+              职业能力情况对比
+            </el-row>
+            <el-table :data="tableData"  class="centered-table" :fit="true" >
+              <el-table-column
+                  stripe
+                  border
+                  v-for="(column, index) in dynamicColumns"
+                  :key="index"
+                  :prop="column.attribute"
+                  :label="column.translation"
+                  :width="getColumnWidth(column.attribute)"
+                  :resizable="column.resizable"
+                  :show-overflow-tooltip="true"
+              ></el-table-column>
+            </el-table>
+          </div>
+          <div style="text-align: center; margin-left: 10px; margin-top: 20px; margin-bottom: 15px; font-size: 20px; font-weight: bold; font-family: '楷体', cursive;">
+            维度选择：
+            <el-select v-model="dimension" placeholder="请选择">
+              <el-option
+                  v-for="item in dimensions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+              </el-option>
+            </el-select>
+            <el-button @click="DrawBar" style="margin-left: 15px" type="success" icon="el-icon-search" circle></el-button>
+          </div>
+          <div style="margin-top: 20px; display: flex; justify-content: center;">
+            <div id="bar-chart" style="width: 100%;height:400px;"></div>
+          </div>
 
         </el-main>
 
@@ -155,6 +183,44 @@ export default {
       props: { multiple: true },
       StudentData: '',
       StudentID: '',
+      tableData: [],
+      dimensions: [
+        { label: '（课程业绩）公必绩点',
+          value: 'stu_ability_compulsory_gpa',
+          },
+        { label: '（课程业绩）专选绩点',
+          value: 'stu_ability_optional_gpa' },
+        { label: '（课程业绩）专必绩点',
+          value: 'stu_ability_major_gpa',
+          },
+        { label: '（综合竞赛）党建思政获奖（校级及以上数量）',
+          value: 'stu_ability_party_award' },
+        { label: '（专业竞赛）学科竞赛获奖（校级及以上数量）：指高校大学生计算机竞赛项目、MCM',
+          value: 'stu_ability_subject_award',
+          },
+        { label: '（综合竞赛）艺术比赛获奖（校级及以上数量）',
+          value: 'stu_ability_art_award' },
+        { label: '（综合竞赛）体育比赛获奖（校级及以上数量）',
+          value: 'stu_ability_sports_award' },
+        { label: '（综合竞赛）实践创业竞赛获奖（校级及以上数量）：特指“赢在中大”、“挑战杯”、“互联网+”、省市级大学生网络攻防比赛',
+          value: 'stu_ability_entrepreneurship_award',
+          },
+        { label: '（专业竞赛）学术成果获奖（校级及以上数量）：特指论文、技术获奖',
+          value: 'stu_ability_academic_award' },
+        { label: '（论文）高水平论文发表（数量）（数据范畴：CCF-A/CCF-B/CCF-C；中科院一区/二区/三区；CSSCI / CSCD / SCI / SSCI / EI / A&HCI ）',
+          value: 'stu_ability_paper',
+          },
+        { label: '（社会服务）志愿服务时长（数量）',
+          value: 'stu_ability_volunteer_time',
+          },
+        { label: '（知识产权）专利发明（数量）',
+          value: 'stu_ability_patent' },
+        { label: '（知识产权）软件著作权发明（数量）',
+          value: 'stu_ability_copyrighy' },
+        { label: '（专著）专著出版（数量）',
+          value: 'stu_ability_monograph' },
+      ],
+      dimension: '',
       StudentIDList: [
         {
           stu_number: '1501010101'
@@ -173,6 +239,20 @@ export default {
         label: '研究生',
         children: []
       }],
+      dynamicColumns: [
+        {
+          attribute: 'date',
+          translation: '日期'
+        },
+        {
+          attribute: 'name',
+          translation: '姓名'
+        },
+        {
+          attribute: 'address',
+          translation: '地址'
+        }
+      ],
 
 
       options: [
@@ -213,7 +293,6 @@ export default {
       ],
       radar_option : {
         title: {
-          text: 'Multiple Radar',
           left: 'center',
           top: '5%' // 调整这个值以确保标题不被挡住
         },
@@ -227,7 +306,7 @@ export default {
             'Another Phone',
           ]
         },
-        radar: [
+        radar:
 
           {
             indicator: [
@@ -241,7 +320,7 @@ export default {
             center: ['50%', '60%']
           },
 
-        ],
+
         series: [
 
           {
@@ -260,7 +339,22 @@ export default {
             ]
           },
         ]
-      }
+      },
+      bar_option : {
+        xAxis: {
+          type: 'category',
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            data: [120, 200, 150, 80, 70, 110, 130],
+            type: 'bar'
+          }
+        ]
+      },
     }
   },
   methods:{
@@ -272,9 +366,22 @@ export default {
       // Example: Display checked items in an alert
       alert('Checked items:\n' + checkedItems.map(item => item.value).join('\n'));
     },
+
+    getColumnWidth(prop) {
+      const maxLength = this.getMaxColumnLength(prop);
+      const titleWidth = prop.length * 15; // Assuming each character width is 15px
+      const dynamicWidth = Math.max(maxLength * 15, titleWidth);
+      return `${Math.min(Math.max(dynamicWidth, 80), 200)}px`; // Ensure the width is between 80px and 200px
+    },
+    getMaxColumnLength(prop) {
+      return this.tableData.reduce((max, item) => {
+        const value = String(item[prop] || ''); // Convert property value to string
+        return Math.max(max, value.length);
+      }, 0);
+    },
     StudentDataShow(){
-      axios.post('http://localhost:10010/stuAbility/selectStuData',{
-        stuNumber:this.StudentID
+      axios.post('http://localhost:10010/stuAbility/getInfo',{
+        stu_number:this.StudentID
       }).then(response => {
         this.StudentData = response.data;
       }).catch(error => {
@@ -282,18 +389,19 @@ export default {
       })
     },
     DrawRadar(){
+      if(this.StudentID === ''){
+        this.$message({
+          message: '请选择学生',
+          type: 'warning'
+        })
+        return;
+      }
       // 使用 map 方法遍历 RadarShows 中的每个子数组，并提取最后一个元素
       const dimension = this.RadarShows.map(arr => arr[arr.length - 1]);
 
       const checkedItems = this.options.filter(item => item.checked);
       const attributes = checkedItems.map(item => item.value);
 
-      let  data= {
-        attributes:attributes,
-        dimension:dimension,
-        stuNumber:this.StudentID,
-      }
-      console.log(data);
 
       axios({
         method: 'post',
@@ -304,15 +412,55 @@ export default {
           stuNumber:this.StudentID,
         }
       }).then(response => {
+        console.log(response.data)
         this.radar_option.series = response.data.series;
         this.radar_option.radar.indicator = response.data.indicator;
         this.radar_option.legend.data = response.data.legend;
+        this.dynamicColumns = response.data.mapping
+        this.tableData = response.data.table;
         this.initializeRadarChart();
       }).catch(error => {
         console.log(error);
       })
 
 
+    },
+
+    DrawBar(){
+      if(this.StudentID === ''){
+        this.$message({
+          message: '请选择学生',
+          type: 'warning'
+        })
+        return;
+      }
+      console.log(this.dimension)
+      console.log(this.StudentID)
+      axios({
+        method: 'post',
+        url: 'http://localhost:10010/stuAbility/createChart2',
+        data: {
+          dimension:this.dimension,
+          stuNumber:this.StudentID,
+        }
+      }).then(response => {
+        console.log(response.data)
+        this.bar_option.series = response.data.series;
+        this.bar_option.xAxis.data = response.data.xAxis;
+        this.initializeBarChart();
+      }).catch(error => {
+        console.log(error);
+      })
+    },
+
+    initializeBarChart() {
+      this.$nextTick(() => {
+        let BarDom = document.getElementById('bar-chart');
+        if (BarDom) {
+          let BarChart = echarts.init(BarDom);
+          BarChart.setOption(this.bar_option,true);
+        }
+      });
     },
 
     initializeRadarChart() {
