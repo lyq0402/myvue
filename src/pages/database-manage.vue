@@ -96,7 +96,13 @@
             </el-row>
           </div>
           <div style="margin-top: 20px">
-            <el-button type="success" @click="open" round>新建数据库</el-button>
+            <el-button type="success"  round>新建数据库</el-button>
+          </div>
+          <div style="margin-top: 20px" class="square-container">
+            <!-- 使用 v-for 指令动态生成小方块 -->
+            <div class="square" v-for="databaseName in databasenamelists" :key="databaseName" @click="handleClick(databaseName)">
+              {{ databaseName }}
+            </div>
           </div>
         </el-main>
 
@@ -117,9 +123,14 @@ export default {
       activeMenu: '/database/manage',
       searchData: '',
       checkType: false,
+      databasenamelists: ["SQL数据库", ],
     }
   },
   methods:{
+    handleClick(databaseName) {
+      // 处理点击事件，可以根据需要跳转或执行其他操作
+      this.$router.push('/database/table/manage');
+    },
 
   }
 }
@@ -151,5 +162,25 @@ export default {
   box-shadow: 2px 0 6px rgba(0,21,41,.35);
   display: flex;
   align-items: center;
+}
+.square-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* 间隔10px */
+}
+.square {
+  width: calc(20% - 10px); /* 每行5个小方块，减去间隔宽度 */
+  height: 100px; /* 固定高度 */
+  background-color: #def3da; /* 浅色背景色 */
+  border: 1px solid #ccc;
+  text-align: center;
+  line-height: 100px;
+  cursor: pointer; /* 让鼠标移上去时显示为手型 */
+  border-radius: 10px; /* 边角弧度设置为10px */
+  transition: background-color 0.3s ease; /* 添加背景色变化的过渡效果 */
+  margin-bottom: 10px; /* 底部间距10px */
+}
+.square:hover {
+  background-color: #e0e0e0; /* 悬停时的浅色背景色 */
 }
 </style>

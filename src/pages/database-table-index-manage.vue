@@ -78,7 +78,44 @@
               <el-breadcrumb-item style="font-size: 20px;"><span style="font-weight: bold; color: #40a9ff">数据库表元素</span></el-breadcrumb-item>
             </el-breadcrumb>
           </div>
-          对数据表元素进行操作
+
+          <div style="margin-top: 20px">
+            <el-select v-model="attribute" placeholder="请选择字段名">
+              <el-option
+                  v-for="item in dynamicColumns"
+                  :key="item.attribute"
+                  :label="item.attribute"
+                  :value="item.attribute">
+              </el-option>
+            </el-select>
+          </div>
+
+          <el-table :data="pagedData"  class="centered-table" :fit="true" >
+            <el-table-column
+                stripe
+                border
+                v-for="(column, index) in dynamicColumns"
+                :key="index"
+                :prop="column.attribute"
+                :label="column.translation"
+                :width="getColumnWidth(column.attribute)"
+                :resizable="column.resizable"
+                :show-overflow-tooltip="true"
+            ></el-table-column>
+          </el-table>
+
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page.sync="currentPage"
+                :page-sizes="[10, 20, 30, 40]"
+                :page-size="pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="tableData.length"
+            ></el-pagination>
+          </div>
+
         </el-main>
 
 
@@ -89,17 +126,65 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "menu-page",
+  props: ['TableName'],
   data(){
     return{
+      attribute: '',
+      pageSize: 10,
+      currentPage: 1,
+      pagedData: [],
       isCollapse:false,
       asideWidth: '200px',
-      activeMenu: '/database/manage'
+      activeMenu: '/database/manage',
+      dynamicColumns:[],
+      tableData:[],
     }
   },
   methods:{
+    getColumnWidth(prop) {
+      const maxLength = this.getMaxColumnLength(prop);
+      const titleWidth = prop.length * 15; // Assuming each character width is 15px
+      const dynamicWidth = Math.max(maxLength * 15, titleWidth);
+      return `${Math.min(Math.max(dynamicWidth, 80), 200)}px`; // Ensure the width is between 80px and 200px
+    },
+    getMaxColumnLength(prop) {
+      return this.tableData.reduce((max, item) => {
+        const value = String(item[prop] || ''); // Convert property value to string
+        return Math.max(max, value.length);
+      }, 0);
+    },
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.handleCurrentChange(1); // 切换每页条数时回到第一页
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      const startIndex = (val - 1) * this.pageSize;
+      const endIndex = startIndex + this.pageSize;
+      this.pagedData = this.tableData.slice(startIndex, endIndex);
+    },
 
+  },
+  mounted() {
+    axios({
+      method: 'post',
+      url: 'http://localhost:10010/DbManage/getTableData',
+      data: {
+        tableName: this.TableName,
+      }
+    }).then(response => {
+      console.log(response.data)
+      this.dynamicColumns = response.data.mapping;
+      this.tableData = response.data.data
+      this.pagedData =  this.tableData.slice(0, this.pageSize);
+
+    }).catch(error => {
+      console.log(error);
+    })
   }
 }
 

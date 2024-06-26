@@ -61,8 +61,9 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../pages/database-table-manage.vue')
   },
   {
-    path: '/database/table/index/manage',
+    path: '/database/table/index/manage/:TableName',
     name: 'database-table-manage-index',
+    props: true, // 开启props传参
     component: () => import(/* webpackChunkName: "about" */ '../pages/database-table-index-manage.vue')
   },
   {

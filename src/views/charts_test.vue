@@ -1,78 +1,77 @@
 <template>
-  <el-container>
-    <el-header class="custom-header">
-      <div class="header-content">
-        <h1 class="header-title">学生学业能力维度观测</h1>
-      </div>
-      <el-button type="text" class="logout-button" @click="handleLogout">退出</el-button>
-    </el-header>
-
-
-    <el-main>
-      <el-row :gutter="10">
-        <el-col :span="8">
-          <el-card>
-            <div class="custom-content">
-              <i class="el-icon-trophy"></i>
-              我的职业能力(近三年）
-            </div>
-            <div style="margin-top: 15px; font-size: 15px; font-weight: bold; font-family: '微软雅黑', cursive;">
-              选择我的能力
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="8">
-          <el-card>
-            aa
-          </el-card>
-        </el-col>
-        <el-col :span="8">
-          <el-card>
-            aa
-          </el-card>
-        </el-col>
-      </el-row>
-    </el-main>
-  </el-container>
+  <el-table :data="tableData" class="centered-table" :fit="true">
+    <el-table-column
+        v-for="(column, index) in dynamicColumns"
+        :key="index"
+        :prop="column.attribute"
+        :label="column.translation"
+        :resizable="column.resizable"
+        :show-overflow-tooltip="true"
+    >
+      <template v-slot="scope">
+        <span v-if="!scope.row.editable" @dblclick="handleRowDoubleClick(scope.row)">{{ scope.row[column.attribute] }}</span>
+        <span v-else>
+          <el-input v-model="scope.row[column.attribute]" size="mini"></el-input>
+        </span>
+      </template>
+    </el-table-column>
+  </el-table>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      tableData: [
+        { id: 1, name: 'John Doe', age: 30, city: 'New York', editable: false },
+        { id: 2, name: 'Jane Smith', age: 25, city: 'Los Angeles', editable: false },
+        { id: 3, name: 'Mike Johnson', age: 35, city: 'Chicago', editable: false },
+        { id: 4, name: 'Emily Davis', age: 28, city: 'San Francisco', editable: false },
+      ],
+      dynamicColumns: [
+        { attribute: 'name', translation: '姓名',  },
+        { attribute: 'age', translation: '年龄', },
+        { attribute: 'city', translation: '城市', },
+      ],
+      editingRow: null,
+    };
+  },
   methods: {
-    handleLogout() {
-      // 处理退出逻辑，例如跳转到登录页面或者清空用户信息等
-      console.log("Logout clicked");
-    }
-  }
+    handleRowDoubleClick(row) {
+      // 双击行时切换编辑状态
+      if (this.editingRow !== row) {
+        // 关闭上一个编辑状态
+        if (this.editingRow) {
+          this.editingRow.editable = false;
+        }
+        // 开启当前行的编辑状态
+        row.editable = true;
+        this.editingRow = row;
+      }
+    },
+    handleClickOutside(event) {
+      // 点击表格空白区域时退出编辑状态
+      const clickedElement = event.target;
+      const isInsideTable = clickedElement.closest('.el-table');
+      if (!isInsideTable) {
+        if (this.editingRow) {
+          this.editingRow.editable = false;
+          this.editingRow = null;
+        }
+      }
+    },
+  },
+  mounted() {
+    // 监听整个文档的点击事件
+    document.addEventListener('click', this.handleClickOutside);
+  },
+  beforeDestroy() {
+    // 组件销毁前移除事件监听
+    document.removeEventListener('click', this.handleClickOutside);
+  },
 };
 </script>
 
 <style scoped>
-.custom-header {
-  background-color: #409EFF; /* 自定义背景颜色 */
-  color: white; /* 字体颜色 */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 60px; /* 设置高度 */
-  padding: 0 20px; /* 可选：为内容添加一些内边距 */
-}
-
-.header-content {
-  flex: 1; /* 占据剩余空间 */
-  text-align: center; /* 文字居中 */
-}
-
-.header-title {
-  margin: 0; /* 去除默认的外边距 */
-}
-
-.logout-button {
-  color: white; /* 将按钮字体颜色设置为白色 */
-}
-
-.custom-content {
-  font-size: 18px; /* 调整字体大小 */
-  color: green;   /* 更改字体颜色 */
-}
+/* 根据需要添加样式 */
 </style>

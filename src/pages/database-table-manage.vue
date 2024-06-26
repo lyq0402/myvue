@@ -77,7 +77,37 @@
               <el-breadcrumb-item style="font-size: 20px;"><span style="font-weight: bold; color: #40a9ff">数据库表</span></el-breadcrumb-item>
             </el-breadcrumb>
           </div>
-          对数据表进行操作
+
+          <div style="margin-top: 20px">
+            <el-button type="success" @click="dialogFormVisible = true"  round>新建数据表</el-button>
+          </div>
+
+          <el-dialog title="新建数据表" :visible.sync="dialogFormVisible">
+            <el-form :model="form">
+              <el-form-item label="数据表名" :label-width="formLabelWidth">
+                <el-input v-model="form.Name" autocomplete="off"></el-input>
+              </el-form-item>
+              <el-form-item label="数据表中文名" :label-width="formLabelWidth">
+                <el-input v-model="form.ChineseName" autocomplete="off"></el-input>
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="dialogFormVisible = false">取 消</el-button>
+              <el-button type="primary" @click="CreateTable">确 定</el-button>
+            </div>
+          </el-dialog>
+
+          <div class="table-square-container">
+            <!-- 使用 v-for 指令动态生成小方块 -->
+            <div class="table-square" v-for="(table, index) in TableList" :key="index" @click="TableDetail(table.tableName)">
+              <div class="table-info">
+                <div><strong>表格名称:</strong> {{ table.tableName }}</div>
+                <div><strong>数据库类型:</strong> {{ table.dataBase }}</div>
+                <div><strong>创建日期:</strong> {{ table.createTime }}</div>
+              </div>
+            </div>
+          </div>
+
         </el-main>
 
 
@@ -88,17 +118,63 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "menu-page",
   data(){
     return{
       isCollapse:false,
       asideWidth: '200px',
-      activeMenu: '/database/manage'
+      activeMenu: '/database/manage',
+      TableList:["api",
+        "api_attribute",
+        "api_record",
+        "stu_info",
+        "stu_info_attribute",
+        "table_info"],
+      dialogFormVisible: false,
+      form: {
+        Name: '',
+        ChineseName:'',
+      },
+      formLabelWidth: '120px'
     }
   },
   methods:{
+    TableDetail(TableName){
+      this.$router.push({ name: 'database-table-manage-index', params: { TableName } });
+    },
+    CreateTable(){
+      axios({
+        method: 'post',
+        url: 'http://localhost:10010/stuAbility/createChart2',
+        data: {
+          dimension:this.dimension,
+          stuNumber:this.StudentID,
+        }
+      }).then(response => {
+        console.log(response.data)
+        this.bar_option.series = response.data.series;
+        this.bar_option.xAxis.data = response.data.xAxis;
+        this.initializeBarChart();
+      }).catch(error => {
+        console.log(error);
+      })
+    },
 
+
+
+  },
+  mounted() {
+    axios.post('http://localhost:10010/DbManage/getTables')
+        .then(response => {
+          this.TableList = response.data
+
+        })
+        .catch(error => {
+          console.log(error)
+        })
   }
 }
 
@@ -129,5 +205,27 @@ export default {
   box-shadow: 2px 0 6px rgba(0,21,41,.35);
   display: flex;
   align-items: center;
+}
+.table-info {
+  font-size: 18px;
+}
+.table-square-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.table-square {
+  flex: 0 0 calc(33.33% - 20px); /* 每行显示三个方块，可以根据需要调整宽度 */
+  padding: 10px;
+  margin: 10px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  text-align: center; /* 文本居中显示 */
+  border-radius: 5px; /* 边角弧度 */
+  background-color: #def3da; /* 方块底色为浅绿色 */
+}
+
+.table-square:hover {
+  background-color: #e0e0e0; /* 悬停时的浅色背景色 */
 }
 </style>
