@@ -216,7 +216,7 @@ export default {
         { label: '（知识产权）专利发明（数量）',
           value: 'stu_ability_patent' },
         { label: '（知识产权）软件著作权发明（数量）',
-          value: 'stu_ability_copyrighy' },
+          value: 'stu_ability_copyright' },
         { label: '（专著）专著出版（数量）',
           value: 'stu_ability_monograph' },
       ],
@@ -287,7 +287,7 @@ export default {
         { label: '（知识产权）专利发明（数量）',
           value: 'stu_info_patent' },
         { label: '（知识产权）软件著作权发明（数量）',
-          value: 'stu_info_copyrighy' },
+          value: 'stu_info_copyright' },
         { label: '（专著）专著出版（数量）',
           value: 'stu_info_monograph' },
       ],
@@ -347,6 +347,9 @@ export default {
         },
         yAxis: {
           type: 'value'
+        },
+        legend: {
+          data: []
         },
         series: [
           {
@@ -447,6 +450,7 @@ export default {
         console.log(response.data)
         this.bar_option.series = response.data.series;
         this.bar_option.xAxis.data = response.data.xAxis;
+        this.bar_option.legend.data = response.data.legend;
         this.initializeBarChart();
       }).catch(error => {
         console.log(error);

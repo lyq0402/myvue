@@ -215,17 +215,22 @@ export default {
 }
 
 .table-square {
-  flex: 0 0 calc(33.33% - 20px); /* 每行显示三个方块，可以根据需要调整宽度 */
-  padding: 10px;
-  margin: 10px;
-  border: 1px solid #ccc;
-  cursor: pointer;
+  flex: 0 0 calc(20% - 20px); /* 让每个方块占据五分之一的宽度，并减少间隙 */
+  padding: 40px 20px; /* 增加内边距，使内容更突出 */
+  margin: 20px 25px; /* 上下间隙增加到20px，左右间隙保持15px */
+  border: 1px solid #b0bec5; /* 边框颜色更柔和 */
+  cursor: pointer; /* 鼠标移动到方块上显示手型光标 */
   text-align: center; /* 文本居中显示 */
-  border-radius: 5px; /* 边角弧度 */
-  background-color: #def3da; /* 方块底色为浅绿色 */
+  border-radius: 10px; /* 圆角边框，稍微调整圆角为10px */
+  background-color: #f0f7f4; /* 浅蓝色背景 */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* 添加轻微阴影效果 */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* 平滑过渡效果 */
+  font-family: Arial, sans-serif; /* 字体设置 */
+  font-size: 16px; /* 字号设置 */
 }
 
 .table-square:hover {
-  background-color: #e0e0e0; /* 悬停时的浅色背景色 */
+  background-color: #e0f7fa; /* 悬停时背景色变化 */
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3); /* 悬停时阴影变化 */
 }
 </style>

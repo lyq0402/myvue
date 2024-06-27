@@ -79,8 +79,16 @@
             </el-breadcrumb>
           </div>
 
-          <div style="margin-top: 20px">
-            <el-select v-model="attribute" placeholder="请选择字段名">
+          <el-row style="font-family: 'Arial Black'; margin-top: 20px;  font-size: 20px;">
+            搜索内容：
+            <el-input
+                placeholder="请输入内容"
+                v-model="searchData"
+                style="width: 300px;">
+              <i slot="prefix" class="el-input__icon el-icon-search"></i>
+            </el-input>
+
+            <el-select v-model="attribute" style="margin-left: 20px" placeholder="请选择">
               <el-option
                   v-for="item in dynamicColumns"
                   :key="item.attribute"
@@ -88,9 +96,10 @@
                   :value="item.attribute">
               </el-option>
             </el-select>
-          </div>
+            <el-button style="margin-left: 30px" @click = "search" round type="primary" icon="el-icon-search">搜索</el-button>
+          </el-row>
 
-          <el-table :data="pagedData"  class="centered-table" :fit="true" >
+          <el-table :data="pagedData"  style="margin-top: 20px" class="centered-table" :fit="true" >
             <el-table-column
                 stripe
                 border
@@ -102,6 +111,11 @@
                 :resizable="column.resizable"
                 :show-overflow-tooltip="true"
             ></el-table-column>
+            <el-table-column label="操作" width="100px">
+              <template v-slot="scope">
+                <el-button type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)"></el-button>
+              </template>
+            </el-table-column>
           </el-table>
 
           <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -133,6 +147,7 @@ export default {
   props: ['TableName'],
   data(){
     return{
+      searchData:'',
       attribute: '',
       pageSize: 10,
       currentPage: 1,
@@ -167,6 +182,25 @@ export default {
       const endIndex = startIndex + this.pageSize;
       this.pagedData = this.tableData.slice(startIndex, endIndex);
     },
+    search(){
+      axios({
+        method: 'post',
+        url: 'http://localhost:10010/DbManage/getTableData',
+        data: {
+          tableName: this.TableName,
+          attribute: this.attribute,
+          value: this.searchData,
+        }
+      }).then(response => {
+        this.tableData = response.data.data;
+        this.pagedData =  this.tableData.slice(0, this.pageSize);
+      }).catch(error => {
+        console.log(error);
+      })
+    },
+    handleDelete(row) {
+      console.log(row)
+    }
 
   },
   mounted() {

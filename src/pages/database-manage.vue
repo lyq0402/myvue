@@ -169,18 +169,22 @@ export default {
   gap: 10px; /* 间隔10px */
 }
 .square {
-  width: calc(20% - 10px); /* 每行5个小方块，减去间隔宽度 */
-  height: 100px; /* 固定高度 */
-  background-color: #def3da; /* 浅色背景色 */
-  border: 1px solid #ccc;
-  text-align: center;
-  line-height: 100px;
-  cursor: pointer; /* 让鼠标移上去时显示为手型 */
-  border-radius: 10px; /* 边角弧度设置为10px */
-  transition: background-color 0.3s ease; /* 添加背景色变化的过渡效果 */
-  margin-bottom: 10px; /* 底部间距10px */
+  flex: 0 0 calc(20% - 20px); /* 让每个方块占据五分之一的宽度，并减少间隙 */
+  padding: 40px 20px; /* 增加内边距，使内容更突出 */
+  margin: 20px 25px; /* 上下间隙增加到20px，左右间隙保持15px */
+  border: 1px solid #b0bec5; /* 边框颜色更柔和 */
+  cursor: pointer; /* 鼠标移动到方块上显示手型光标 */
+  text-align: center; /* 文本居中显示 */
+  border-radius: 10px; /* 圆角边框，稍微调整圆角为10px */
+  background-color: #f0f7f4; /* 浅蓝色背景 */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15); /* 添加轻微阴影效果 */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* 平滑过渡效果 */
+  font-family: Arial, sans-serif; /* 字体设置 */
+  font-size: 16px; /* 字号设置 */
 }
+
 .square:hover {
-  background-color: #e0e0e0; /* 悬停时的浅色背景色 */
+  background-color: #e0f7fa; /* 悬停时背景色变化 */
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3); /* 悬停时阴影变化 */
 }
 </style>
