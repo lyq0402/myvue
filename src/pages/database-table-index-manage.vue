@@ -109,14 +109,35 @@
                 :label="column.translation"
                 :width="getColumnWidth(column.attribute)"
                 :resizable="column.resizable"
+                :editable="true"
                 :show-overflow-tooltip="true"
-            ></el-table-column>
+            >
+              <template v-slot="scope">
+                <span v-if="!scope.row.editable" >{{ scope.row[column.attribute] }}</span>
+                  <span v-else>
+                    <el-input v-model="scope.row[column.attribute]" size="mini"></el-input>
+                  </span>
+              </template>
+            </el-table-column>
             <el-table-column label="操作" width="100px">
               <template v-slot="scope">
-                <el-button type="danger" icon="el-icon-delete" @click="handleDelete(scope.row)"></el-button>
+                <el-button
+                    v-if="scope.row.isNew"
+                    type="primary"
+                    icon="el-icon-check"
+                    @click="handleSave(scope.row)"
+                >保存</el-button>
+                <el-button
+                    v-else
+                    type="danger"
+                    icon="el-icon-delete"
+                    @click="handleDelete(scope.row)"
+                >删除</el-button>
               </template>
             </el-table-column>
           </el-table>
+          <!-- 新增按钮 -->
+          <el-button style="margin-top: 10px;" type="primary" @click="addNewRow">新增</el-button>
 
           <div style="display: flex; align-items: center; justify-content: space-between;">
             <el-pagination
@@ -128,6 +149,35 @@
                 layout="total, sizes, prev, pager, next, jumper"
                 :total="tableData.length"
             ></el-pagination>
+          </div>
+
+          <div>
+            <el-row style="margin-top: 200px;">
+              <span style="font-family: 'Arial Black'; font-size: 18px;">数据表结构：</span>
+            </el-row>
+            <el-table :data="table_tableData"  style="margin-top: 20px" class="centered-table" :fit="true" >
+              <el-table-column
+                  stripe
+                  border
+                  v-for="(column, index) in table_dynamicColumns"
+                  :key="index"
+                  :prop="column.attribute"
+                  :label="column.translation"
+
+                  :resizable="column.resizable"
+                  :editable="true"
+                  :show-overflow-tooltip="true"
+              >
+              </el-table-column>
+              <el-table-column label="操作" width="160px">
+                <template v-slot="scope">
+                  <div style="display: flex; align-items: center;">
+                    <el-button type="primary" icon="el-icon-edit" @click="handleEdit(scope.row)">修改</el-button>
+                    <el-button type="danger" icon="el-icon-delete" @click="handleDelete_Table(scope.row)">删除</el-button>
+                  </div>
+                </template>
+              </el-table-column>
+            </el-table>
           </div>
 
         </el-main>
@@ -156,6 +206,8 @@ export default {
       asideWidth: '200px',
       activeMenu: '/database/manage',
       dynamicColumns:[],
+      table_dynamicColumns:[],
+      table_tableData:[],
       tableData:[],
     }
   },
@@ -199,7 +251,114 @@ export default {
       })
     },
     handleDelete(row) {
+      const attributeName = this.dynamicColumns[0].attribute;
+      let data={
+        tableName:  this.TableName,
+        attribute: attributeName,
+        value: row[attributeName],
+      }
+      console.log(data)
+      this.$confirm('此操作将永久删除该API, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true
+      }).then(() => {
+        // 用户点击确定按钮后执行的操作
+        axios({
+          method: 'post',
+          url: 'http://localhost:10010/DbManage/deleteRecord',
+          data: {
+            tableName:  this.TableName,
+            attribute: attributeName,
+            value: row[attributeName],
+          }
+        }).then(response => {
+          let status = response.data;
+          if (status) {
+            this.$message.success('删除成功');
+            this.search(); // 重新获取数据
+            this.currentPage = 1; // 恢复到第一页
+          } else {
+            this.$message.error('删除失败');
+          }
+        }).catch(error => {
+          console.log(error);
+          this.$message.error('删除失败，请稍后重试');
+        });
+      }).catch(() => {
+        // 用户点击取消按钮后执行的操作
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    },
+    addNewRow() {
+      // 新增空白行
+      const newRow = { editable: true, isNew: true };
+      // 初始化空白行数据，以确保每列都有初始值
+      this.dynamicColumns.forEach(column => {
+        newRow[column.attribute] = ''; // 可以根据需要设置初始值
+      });
+      this.pagedData.push(newRow);
+    },
+    handleSave(row) {
+      // 处理保存操作，可以在这里进行保存逻辑
+      // 确认保存后，将 isNew 设置为 false，表示行已保存
+      //row.isNew = false;
       console.log(row)
+      // 可以在这里触发保存到后端的逻辑
+    },
+    handleDelete_Table(row){
+      console.log(row)
+      this.$confirm('此操作将永久删除该API, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true
+      }).then(() => {
+        // 用户点击确定按钮后执行的操作
+        axios({
+          method: 'post',
+          url: 'http://localhost:10010/DbManage/deleteField',
+          data: {
+            tableName:  this.TableName,
+            Field: row.Field
+          }
+        }).then(response => {
+          let status = response.data;
+          if (status) {
+            this.$message.success('删除成功');
+            axios({
+              method: 'post',
+              url: 'http://localhost:10010/DbManage/getTableStruct',
+              data: {
+                tableName: this.TableName,
+              }
+            }).then(response => {
+              console.log(response.data)
+              this.table_dynamicColumns = response.data.mapping;
+              this.table_tableData = response.data.data
+
+
+            }).catch(error => {
+              console.log(error);
+            })
+          } else {
+            this.$message.error('删除失败');
+          }
+        }).catch(error => {
+          console.log(error);
+          this.$message.error('删除失败，请稍后重试');
+        });
+      }).catch(() => {
+        // 用户点击取消按钮后执行的操作
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
     }
 
   },
@@ -215,6 +374,38 @@ export default {
       this.dynamicColumns = response.data.mapping;
       this.tableData = response.data.data
       this.pagedData =  this.tableData.slice(0, this.pageSize);
+
+    }).catch(error => {
+      console.log(error);
+    })
+
+    axios({
+      method: 'post',
+      url: 'http://localhost:10010/DbManage/getTableData',
+      data: {
+        tableName: this.TableName,
+      }
+    }).then(response => {
+      console.log(response.data)
+      this.dynamicColumns = response.data.mapping;
+      this.tableData = response.data.data
+      this.pagedData =  this.tableData.slice(0, this.pageSize);
+
+    }).catch(error => {
+      console.log(error);
+    })
+
+    axios({
+      method: 'post',
+      url: 'http://localhost:10010/DbManage/getTableStruct',
+      data: {
+        tableName: this.TableName,
+      }
+    }).then(response => {
+      console.log(response.data)
+      this.table_dynamicColumns = response.data.mapping;
+      this.table_tableData = response.data.data
+
 
     }).catch(error => {
       console.log(error);

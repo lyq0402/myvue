@@ -23,7 +23,7 @@ export default {
   data() {
     return {
       tableData: [
-        { id: 1, name: 'John Doe', age: 30, city: 'New York', editable: false },
+        { id: 1, name: '', age:0 , city: '', editable: true },
         { id: 2, name: 'Jane Smith', age: 25, city: 'Los Angeles', editable: false },
         { id: 3, name: 'Mike Johnson', age: 35, city: 'Chicago', editable: false },
         { id: 4, name: 'Emily Davis', age: 28, city: 'San Francisco', editable: false },
