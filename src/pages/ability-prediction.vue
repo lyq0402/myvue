@@ -123,7 +123,7 @@
 
 
                 <div style="margin-top: 20px; display: flex; justify-content: center;">
-                  <div  id="radar-chart" style="width: 1200px; height: 400px;"></div>
+                  <div  id="radar-chart" style="width: 1200px; height: 485px;"></div>
                 </div>
               </el-card>
             </el-col>
@@ -316,7 +316,7 @@ export default {
               { name: 'Performance', max: 100 },
               { name: 'Screen', max: 200 }
             ],
-            radius: 80,
+            radius: 160,
             center: ['50%', '60%']
           },
 
