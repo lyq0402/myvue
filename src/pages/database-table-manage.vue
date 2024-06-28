@@ -79,7 +79,7 @@
           </div>
 
           <div style="margin-top: 20px">
-            <el-button type="success" @click="dialogFormVisible = true"  round>新建数据表</el-button>
+            <el-button @click="dialogFormVisible = true"  round class="custom-button">新建数据表</el-button>
           </div>
 
           <el-dialog title="新建数据表" :visible.sync="dialogFormVisible">
@@ -181,6 +181,7 @@ export default {
 </script>
 
 <style>
+
 .el-menu--inline .el-menu-item {
   background-color: #000c17  !important;
 }
@@ -212,7 +213,34 @@ export default {
 .table-square-container {
   display: flex;
   flex-wrap: wrap;
+  .custom-button {
+    background-color: #409eff; /* 按钮背景颜色 */
+    color: #ffffff; /* 文字颜色 */
+    border: none; /* 无边框 */
+    padding: 8px 15px; /* 减小内边距 */
+    font-size: 14px; /* 减小字体大小 */
+    font-weight: bold; /* 字体加粗 */
+    border-radius: 4px; /* 圆角稍微减小 */
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1); /* 减小阴影效果 */
+    cursor: pointer; /* 鼠标悬停时显示手形图标 */
+    transition: background-color 0.3s, box-shadow 0.3s, transform 0.3s; /* 添加变换过渡效果 */
+    outline: none; /* 点击时不显示轮廓 */
+  }
+
+  .custom-button:hover {
+    background-color: #3a8ee6; /* 鼠标悬停时的背景颜色 */
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.2); /* 鼠标悬停时的阴影效果 */
+    transform: scale(1.05); /* 鼠标悬停时放大按钮 */
+  }
+
+  .custom-button:active {
+    background-color: #3274d1; /* 鼠标按下时的背景颜色 */
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.15); /* 鼠标按下时的阴影效果 */
+    transform: scale(0.95); /* 鼠标按下时缩小按钮 */
+  }
 }
+
+
 
 .table-square {
   flex: 0 0 calc(20% - 20px); /* 让每个方块占据五分之一的宽度，并减少间隙 */
@@ -233,4 +261,5 @@ export default {
   background-color: #e0f7fa; /* 悬停时背景色变化 */
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3); /* 悬停时阴影变化 */
 }
+
 </style>

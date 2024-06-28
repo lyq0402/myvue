@@ -87,14 +87,14 @@
           <el-row style="margin-top: 20px;">
             <div class="custom-content">
               <i class="el-icon-trophy"></i>
-              我的职业能力(近三年）
+              学生能力
             </div>
           </el-row>
           <el-row :gutter="10">
             <el-col :span="10">
               <el-card>
                 <div style=" margin-left: 10px; font-size: 15px; font-weight: bold; font-family: '微软雅黑', cursive;">
-                  选择我的能力
+                  选择学生能力
                 </div>
                 <div class="checkbox-list">
                   <div class="row">
@@ -131,7 +131,7 @@
 
           <div>
             <el-row style="text-align: center; margin-left: 10px; margin-bottom: 15px; font-size: 20px; font-weight: bold; font-family: '楷体', cursive;">
-              职业能力情况对比
+              学生能力情况对比
             </el-row>
             <el-table :data="tableData"  class="centered-table" :fit="true" >
               <el-table-column

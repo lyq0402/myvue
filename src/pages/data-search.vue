@@ -875,7 +875,7 @@ export default {
       }],
       databaseList: [{
         value: '选项1',
-        label: '黄金糕'
+        label: '学院数据'
       }, {
         value: '选项2',
         label: '双皮奶'

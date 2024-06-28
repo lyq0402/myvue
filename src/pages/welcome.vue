@@ -1,7 +1,7 @@
 <template>
   <div class="background-container">
     <div class="centered-text-title">
-      <strong style="font-family: 宋体,serif; font-size: 5em;">数据中台系统</strong>
+      <strong style="font-family: 楷体,serif; font-size: 5em;">数据中台系统</strong>
     </div>
     <div class="centered-text-login">
       <strong style="font-family: 楷体,serif; font-size: 3.5em;">登录</strong>
@@ -17,7 +17,7 @@
               placeholder="请输入用户账号"
               v-model="username"
               suffix-icon="el-icon-s-promotion"
-              style="width: 300px;">
+              style="width: 260px;">
           </el-input>
         </el-col>
       </el-row>
@@ -30,7 +30,7 @@
               type="password"
               placeholder="请输入密码"
               v-model="password"
-              style="width: 300px;">
+              style="width: 260px;">
           </el-input>
         </el-col>
       </el-row>
@@ -48,7 +48,7 @@
   position: relative;
   width: 100%;
   height: 100vh;
-  background-image: url('@/assets/images/background-image.jpg');
+  background-image: linear-gradient(to top, rgba(255, 255, 255, 0), rgba(200, 200, 200, 1)), url('@/assets/images/xx.jpg');
   background-size: cover;
   background-position: center;
 }
