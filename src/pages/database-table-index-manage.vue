@@ -56,7 +56,7 @@
           <div style="flex: 1; width: 0;  display: flex; align-items: center; justify-content: flex-end;">
             <el-dropdown placement="bottom">
               <div style="display: flex; align-items: center; cursor:default" >
-                <span style="margin-right: 5px;">用户名</span>
+                <span style="margin-right: 5px;">小猫咪</span>
                 <i class="el-icon-user-solid"></i>
               </div>
               <el-dropdown-menu slot="dropdown">
@@ -152,7 +152,7 @@
           </div>
 
           <div>
-            <el-row style="margin-top: 200px;">
+            <el-row style="margin-top: 100px;">
               <span style="font-family: 'Arial Black'; font-size: 18px;">数据表结构：</span>
             </el-row>
             <el-table :data="table_tableData"  style="margin-top: 20px" class="centered-table" :fit="true" >

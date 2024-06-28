@@ -56,7 +56,7 @@
           <div style="flex: 1; width: 0;  display: flex; align-items: center; justify-content: flex-end;">
             <el-dropdown placement="bottom">
               <div style="display: flex; align-items: center; cursor:default" >
-                <span style="margin-right: 5px;">用户名</span>
+                <span style="margin-right: 5px;">小猫咪</span>
                 <i class="el-icon-user-solid"></i>
               </div>
               <el-dropdown-menu slot="dropdown">
@@ -118,7 +118,7 @@
                       :options="RadarShowList"
                       :props="props"
                       clearable></el-cascader>
-                  <el-button @click="DrawRadar" style="margin-left: 15px" type="success" icon="el-icon-search" circle></el-button>
+                  <el-button @click="DrawRadar" style="margin-left: 15px" type="primary" icon="el-icon-search" circle></el-button>
                 </div>
 
 
@@ -157,7 +157,7 @@
                   :value="item.value">
               </el-option>
             </el-select>
-            <el-button @click="DrawBar" style="margin-left: 15px" type="success" icon="el-icon-search" circle></el-button>
+            <el-button @click="DrawBar" style="margin-left: 15px" type="primary" icon="el-icon-search" circle></el-button>
           </div>
           <div style="margin-top: 20px; display: flex; justify-content: center;">
             <div id="bar-chart" style="width: 100%;height:400px;"></div>
@@ -449,7 +449,7 @@ export default {
       }).then(response => {
         console.log(response.data)
         this.bar_option.series = response.data.series;
-        this.bar_option.xAxis.data = response.data.xAxis;
+        this.bar_option.xAxis.data = response.data.xValues;
         this.bar_option.legend.data = response.data.legend;
         this.initializeBarChart();
       }).catch(error => {
