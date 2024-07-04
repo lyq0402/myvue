@@ -60,7 +60,6 @@ export default {
         { id: 11, date: '2024-05-01', name: '张三', address: '北京' },
         { id: 13, date: '2024-05-18', name: '赵二十', address: '石家庄' },
         { id: 2, date: '2024-05-17', name: '王十九', address: '济南' },
-        { id: 16, date: '2024-05-14', name: '周十六', address: '青岛' },
       ];
     },
     handleSizeChange(val) {

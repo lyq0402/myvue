@@ -117,6 +117,7 @@
                       v-model = "RadarShows"
                       :options="RadarShowList"
                       :props="props"
+                      style="width: 300px"
                       clearable></el-cascader>
                   <el-button @click="DrawRadar" style="margin-left: 15px" type="primary" icon="el-icon-search" circle></el-button>
                 </div>
